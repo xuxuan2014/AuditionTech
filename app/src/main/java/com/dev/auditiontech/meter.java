@@ -18,15 +18,21 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.UUID;
 import android.util.Log;
 
 public class meter extends AppCompatActivity {
 
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+
+
     double db;
     private Button meterStart;
     private Button meterStop;
@@ -171,7 +177,11 @@ public class meter extends AppCompatActivity {
             if (ratio > 1)
             {
                 db = 20 * Math.log10(ratio);
-                //Db = 20 * Math.log10((double)Math.abs(amplitude) / 32768);
+
+                String date = getDate();
+                String time = getTime();
+                mDatabase.child(date).child(time).setValue(db);
+
                 meterDB.setText(Double.toString(db));
                 //Toast.makeText(this, "Decibel" + db, Toast.LENGTH_SHORT).show();
                 if (db < 80) {
@@ -200,6 +210,22 @@ public class meter extends AppCompatActivity {
         meterStart.setEnabled(true);
         meterStop.setEnabled(false);
         mediaRecorder.stop();
+    }
+
+    public String getDate() {
+        Calendar calendar1 = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+
+        String date = simpleDateFormat.format(calendar1.getTime());
+        return date;
+    }
+
+    public String getTime() {
+        Calendar calendar1 = Calendar.getInstance();
+        SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("hh:mm:ss");
+
+        String time = simpleTimeFormat.format(calendar1.getTime());
+        return time;
     }
 
 }

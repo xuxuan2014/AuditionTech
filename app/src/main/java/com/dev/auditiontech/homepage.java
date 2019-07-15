@@ -88,7 +88,7 @@ public class homepage extends AppCompatActivity {
     }
 
     public void openHistory() {
-        Intent intent = new Intent(homepage.this, history.class);
+        Intent intent = new Intent(homepage.this, test.class);
         startActivity(intent);
     }
 
