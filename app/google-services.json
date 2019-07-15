@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "322343067146",
+    "firebase_url": "https://auditiontechapp-b09c3.firebaseio.com",
+    "project_id": "auditiontechapp-b09c3",
+    "storage_bucket": "auditiontechapp-b09c3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:322343067146:android:fc55629537825bac",
+        "android_client_info": {
+          "package_name": "com.dev.auditiontech"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "322343067146-f2rlc6192ccimreasntto3tkgib3r2b9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dev.auditiontech",
+            "certificate_hash": "c6c5c326231a5dfffa334fde9866e926af7b1fea"
+          }
+        },
+        {
+          "client_id": "322343067146-u6gapoui0m750rm0ks1hosdpr0i3r8ts.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWPcXniACFeMjpcaLebyA0RQqdfYTBSeU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "322343067146-u6gapoui0m750rm0ks1hosdpr0i3r8ts.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
