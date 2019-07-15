@@ -12,19 +12,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="42dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginStart="33dp"
+        android:layout_marginTop="45dp"
         android:text="Decibel Meter"
-        android:textSize="30sp"/>
+        android:textSize="30sp" />
 
     <Button
-        android:id="@+id/meterSTART"
+        android:id="@+id/btnRecord"
         android:layout_width="147dp"
         android:layout_height="67dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="31dp"
-        android:layout_marginTop="606dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="389dp"
         android:text="Start" />
 
     <TextView
@@ -33,8 +33,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="85dp"
-        android:layout_marginTop="163dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="108dp"
         android:text="0.00"
         android:textColor="#FF0000"
         android:textSize="30sp" />
@@ -45,20 +45,20 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="264dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="161dp"
         android:text='Click "Start" to measure your real-time sound exposure.'
         android:textColor="#0E0D0D"
         android:textSize="30sp" />
 
     <Button
-        android:id="@+id/meterSTOP"
+        android:id="@+id/btnStopRecord"
         android:layout_width="150dp"
         android:layout_height="71dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="226dp"
-        android:layout_marginTop="605dp"
+        android:layout_marginStart="206dp"
+        android:layout_marginTop="382dp"
         android:text="stop" />
 
     <TextView
@@ -67,8 +67,8 @@
         android:layout_height="133dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="36dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginBottom="60dp"
         android:text="The resultant hearing loss could be permanent but preventable"
         android:textColor="#180C41"
         android:textSize="20sp" />

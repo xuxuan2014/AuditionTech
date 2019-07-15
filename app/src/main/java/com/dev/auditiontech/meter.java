@@ -22,10 +22,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.UUID;
+import android.util.Log;
 
 public class meter extends AppCompatActivity {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
+    double db;
     private Button meterStart;
     private Button meterStop;
     private TextView meterDB;
@@ -54,19 +56,24 @@ public class meter extends AppCompatActivity {
 
                 if (checkPermissionFromDevice()) {
 
-                    pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                            "/" + UUID.randomUUID().toString() + "_audio_record.3gp";
+                    //pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() +
+                    //        "/" + UUID.randomUUID().toString() + "_audio_record.3gp";
+
+                    pathSave = "/dev/null";
+
+
                     setupMediaRecorder();
                     try {
                         mediaRecorder.prepare();
                         mediaRecorder.start();
+                        Toast.makeText(meter.this, "Measuring...", Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
                     meterStart.setEnabled(false);
                     meterStop.setEnabled(true);
-                    Toast.makeText(meter.this, "Measuring...", Toast.LENGTH_SHORT).show();
+
                 } else {
                     requestPermissions();
                 }
@@ -80,17 +87,30 @@ public class meter extends AppCompatActivity {
         meterStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                micStop();
+                if (mediaRecorder != null) {
+                    try {
+                        mediaRecorder.stop();
+                    } catch (IllegalStateException e) {
 
+                        //e.printStackTrace();
+                        mediaRecorder = null;
+                        mediaRecorder = new MediaRecorder();
+                    }
+                    mediaRecorder.release();
+                    mediaRecorder = null;
 
+                }
+
+                meterStart.setEnabled(true);
+                meterStop.setEnabled(false);
             }
         });
 
     }
 
     private void setupUIViews() {
-        meterStart = findViewById(R.id.meterSTART);
-        meterStop = findViewById(R.id.meterSTOP);
+        meterStart = findViewById(R.id.btnRecord);
+        meterStop = findViewById(R.id.btnStopRecord);
         meterDB = findViewById(R.id.meterDB);
         meterReminder = findViewById(R.id.meterREMINDER);
     }
@@ -140,15 +160,18 @@ public class meter extends AppCompatActivity {
     };
 
     private int BASE = 1;
-    private int SPACE = 100;
+    private int SPACE = 1000;
 
     public void updateMicStatus() {
         if (mediaRecorder != null) {
-            double ratio = (double)mediaRecorder.getMaxAmplitude() /BASE;
-            double db = 0;
+
+            double amplitude = (double)mediaRecorder.getMaxAmplitude();
+            double ratio = amplitude /BASE;
+
             if (ratio > 1)
             {
                 db = 20 * Math.log10(ratio);
+                //Db = 20 * Math.log10((double)Math.abs(amplitude) / 32768);
                 meterDB.setText(Double.toString(db));
                 //Toast.makeText(this, "Decibel" + db, Toast.LENGTH_SHORT).show();
                 if (db < 80) {
@@ -168,7 +191,7 @@ public class meter extends AppCompatActivity {
                     meterReminder.setTextColor(Color.rgb(139,0,0));
                 }
             }
-            //Log.d(TAG,"Decibel:"+db);
+            //Log.d(TAG,"amplitude:"+amplitude);
             mHandler.postDelayed(mUpdateMicStatusTimer, SPACE);
         }
     }
