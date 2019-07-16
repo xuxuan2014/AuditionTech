@@ -179,8 +179,9 @@ public class meter extends AppCompatActivity {
                 db = 20 * Math.log10(ratio);
 
                 String date = getDate();
-                String time = getTime();
-                mDatabase.child(date).child(time).setValue(db);
+                int sec = getHour()*3600 + getMinute()*60+getSecond();
+                String secStr = Integer.toString(sec);
+                mDatabase.child(date).child(secStr).setValue(db);
 
                 meterDB.setText(Double.toString(db));
                 //Toast.makeText(this, "Decibel" + db, Toast.LENGTH_SHORT).show();
@@ -220,12 +221,22 @@ public class meter extends AppCompatActivity {
         return date;
     }
 
-    public String getTime() {
+    public Integer getHour() {
         Calendar calendar1 = Calendar.getInstance();
-        SimpleDateFormat simpleTimeFormat = new SimpleDateFormat("hh:mm:ss");
+        int hour = calendar1.get(Calendar.HOUR);
+        return hour;
+    }
 
-        String time = simpleTimeFormat.format(calendar1.getTime());
-        return time;
+    public Integer getMinute() {
+        Calendar calendar1 = Calendar.getInstance();
+        int minute = calendar1.get(Calendar.MINUTE);
+        return minute;
+    }
+
+    public Integer getSecond() {
+        Calendar calendar1 = Calendar.getInstance();
+        int second = calendar1.get(Calendar.SECOND);
+        return second;
     }
 
 }
