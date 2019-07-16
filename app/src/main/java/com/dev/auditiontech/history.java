@@ -40,6 +40,7 @@ public class history extends AppCompatActivity {
         getSupportActionBar().setTitle("Day Cumulative");
         Firebase.setAndroidContext(this);
         setupUIViews();
+        readData();
 
         map = new HashMap<Integer,Integer>();
 
@@ -97,10 +98,10 @@ public class history extends AppCompatActivity {
         ArrayList<Entry> dataVals = new ArrayList<>();
 
         for (i=17967; i<17980; i++) {
-            readData();
+            //readData();
             //String yVal = map.get(i).toString();
             //Toast.makeText(this, yVal, Toast.LENGTH_LONG).show();
-            dataVals.add(new Entry(i,map.get(i)));
+            dataVals.add(new Entry(i,100));
         }
 
         return dataVals;
