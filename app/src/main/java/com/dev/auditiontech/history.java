@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class history extends AppCompatActivity {
@@ -60,11 +61,18 @@ public class history extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<Entry> dataValues1 = new ArrayList<Entry>();
 
-                int i=0;
+                //int i=0;
+                Calendar calendar1 = Calendar.getInstance();
+                int hour = calendar1.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar1.get(Calendar.MINUTE);
+                int second = calendar1.get(Calendar.SECOND);
+                int secCount = 3600* hour+60*minute+second;
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    i=i+1;
+
+                   secCount++;
+                    //i=i+1;
                     int decibel = ds.getValue(Integer.class);
-                    dataValues1.add(new Entry(i, decibel));
+                    dataValues1.add(new Entry(secCount, decibel));
 
 
 

@@ -109,6 +109,9 @@ public class meter extends AppCompatActivity {
 
                 meterStart.setEnabled(true);
                 meterStop.setEnabled(false);
+
+                //mediaRecorder.stop();
+
             }
         });
 
@@ -208,11 +211,6 @@ public class meter extends AppCompatActivity {
         }
     }
 
-    private void micStop() {
-        meterStart.setEnabled(true);
-        meterStop.setEnabled(false);
-        mediaRecorder.stop();
-    }
 
     public String getDate() {
         Calendar calendar1 = Calendar.getInstance();
