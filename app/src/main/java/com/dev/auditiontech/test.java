@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -18,7 +19,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,10 +46,12 @@ public class test extends AppCompatActivity {
         getSupportActionBar().setTitle("Day Cumulative");
         Firebase.setAndroidContext(this);
         setupUIViews();
+        readData();
+
 
         LineDataSet lineDataSet1 = new LineDataSet(dataValues1(), "Threshold");
         LineDataSet lineDataSet2 = new LineDataSet(dataValues2(), "cumulative");
-        ArrayList<ILineDataSet> dataSets =  new ArrayList<>();
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(lineDataSet1);
         dataSets.add(lineDataSet2);
 
@@ -81,17 +83,17 @@ public class test extends AppCompatActivity {
     }
 
     private void setupUIViews() {
-        mpLineChart = findViewById(R.id.LineChart);
-        historyDayDiscrete = findViewById(R.id.testDayDiscrete);
-        historyDayCumulative = findViewById(R.id.testDayCumulative);
-        historyWeekCumulative = findViewById(R.id.testWeekCumulative);
+        mpLineChart = findViewById(R.id.lineChart);
+        historyDayDiscrete = findViewById(R.id.historyDayDiscrete);
+        historyDayCumulative = findViewById(R.id.historyDayCumulative);
+        historyWeekCumulative = findViewById(R.id.historyWeekCumulative);
     }
 
     private ArrayList<Entry> dataValues1() {
         ArrayList<Entry> dataVals = new ArrayList<Entry>();
 
-        for (int i =0; i<24; i++) {
-            dataVals.add(new Entry(i,161));
+        for (int i = 17967; i < 17980; i++) {
+            dataVals.add(new Entry(i, 161));
         }
 
         return dataVals;
@@ -100,8 +102,13 @@ public class test extends AppCompatActivity {
     private ArrayList<Entry> dataValues2() {
         ArrayList<Entry> dataVals = new ArrayList<>();
 
-        for (int i = 0; i<24; i++) {
-            dataVals.add(new Entry(i,sum));
+        for (int i = 17967; i < 17980; i++) {
+
+
+            //Log.d(TAG, Integer.toString(map.get(secCount)));
+            //String yVal = map.get(i).toString();
+            //Toast.makeText(this, yVal, Toast.LENGTH_LONG).show();
+            dataVals.add(new Entry(i, 100));
         }
 
         return dataVals;
@@ -125,20 +132,52 @@ public class test extends AppCompatActivity {
     public void readData() {
 
 
-        mReference = new Firebase("https://auditiontechapp-b09c3.firebaseio.com/15-Jul-2019/" );
+        mReference = new Firebase("https://auditiontechapp-b09c3.firebaseio.com/17-Jul-2019/");
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
-                String decibel = dataSnapshot.getValue(Double.class).toString();
-                Toast.makeText(test.this, decibel, Toast.LENGTH_SHORT).show();
+            public void onDataChange(@NonNull com.firebase.client.DataSnapshot dataSnapshot) {
+
+                //yData = new ArrayList<>();
+                float i = 0;
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    i = i + 1;
+                    String SV = ds.child("P1").getValue().toString();
+                    Float SensorValue = Float.parseFloat(SV);
+                    //yData.add(new Entry(i, SensorValue));
+                }
+                //final LineDataSet lineDataSet = new LineDataSet(yData, "Temp");
+                //LineData data = new LineData(lineDataSet);
+                //mpLineChart.setData(data);
+                mpLineChart.notifyDataSetChanged();
+                mpLineChart.invalidate();
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {}
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
         });
+
+
+//            mReference = new Firebase("https://auditiontechapp-b09c3.firebaseio.com/17-Jul-2019/");
+//            mReference.addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
+//
+//                    map = new HashMap<Integer,Integer>();
+//
+//                    int decibel =dataSnapshot.getValue(Integer.class);
+//                    map.put(secCount,decibel);
+//                }
+//
+//                @Override
+//                public void onCancelled(FirebaseError firebaseError) {
+//                }
+//            });
+//        Log.d(TAG, "decibel" + map.get(secCount));
+//
+//    }
+
+
     }
-
-
-
-
 }

@@ -33,7 +33,7 @@ public class meter extends AppCompatActivity {
     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
 
-    double db;
+    int db;
     private Button meterStart;
     private Button meterStop;
     private TextView meterDB;
@@ -176,14 +176,15 @@ public class meter extends AppCompatActivity {
 
             if (ratio > 1)
             {
-                db = 20 * Math.log10(ratio);
+                double decibel = 20 * Math.log10(ratio);
+                db = (int)decibel;
 
                 String date = getDate();
                 int sec = getHour()*3600 + getMinute()*60+getSecond();
                 String secStr = Integer.toString(sec);
                 mDatabase.child(date).child(secStr).setValue(db);
 
-                meterDB.setText(Double.toString(db));
+                meterDB.setText(Integer.toString(db));
                 //Toast.makeText(this, "Decibel" + db, Toast.LENGTH_SHORT).show();
                 if (db < 80) {
                     meterReminder.setText("You are in a safe listening environment.");
@@ -223,7 +224,7 @@ public class meter extends AppCompatActivity {
 
     public Integer getHour() {
         Calendar calendar1 = Calendar.getInstance();
-        int hour = calendar1.get(Calendar.HOUR);
+        int hour = calendar1.get(Calendar.HOUR_OF_DAY);
         return hour;
     }
 
