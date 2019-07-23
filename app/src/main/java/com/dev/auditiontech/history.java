@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -47,7 +48,11 @@ public class history extends AppCompatActivity {
         getSupportActionBar().setTitle("Day Discrete");
         Firebase.setAndroidContext(this);
         setupUIViews();
-        mReference = FirebaseDatabase.getInstance().getReference("18-Jul-2019");
+        Calendar calendar1 = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+
+        String date = simpleDateFormat.format(calendar1.getTime());
+        mReference = FirebaseDatabase.getInstance().getReference(date);
         plot();
 
     }

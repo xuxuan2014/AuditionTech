@@ -29,13 +29,13 @@
 
     <TextView
         android:id="@+id/meterDB"
-        android:layout_width="269dp"
+        android:layout_width="74dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="83dp"
-        android:layout_marginTop="105dp"
-        android:text="Please turn on your microphone."
+        android:layout_marginStart="107dp"
+        android:layout_marginTop="109dp"
+        android:text="0"
         android:textColor="#FF0000"
         android:textSize="30sp" />
 
@@ -72,5 +72,15 @@
         android:text="The resultant hearing loss could be permanent but preventable"
         android:textColor="#180C41"
         android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="190dp"
+        android:layout_marginTop="121dp"
+        android:text="dB" />
 
 </RelativeLayout>
