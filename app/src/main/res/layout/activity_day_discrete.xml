@@ -4,33 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".history">
+    tools:context=".dayDiscrete">
 
     <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/lineChart"
+        android:id="@+id/DDLineChart"
         android:layout_width="match_parent"
         android:layout_height="621dp" />
 
+
     <Button
-        android:id="@+id/historyDayDiscrete"
+        android:id="@+id/DDDayCumulative"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="57dp"
+        android:layout_marginStart="71dp"
+        android:layout_marginBottom="26dp"
+        android:text="Today" />
+
+    <Button
+        android:id="@+id/DDWeekCumulative"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="226dp"
         android:layout_marginBottom="24dp"
-        android:text="By hour" />
-
-
-
-    <Button
-        android:id="@+id/historyWeekCumulative"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="249dp"
-        android:layout_marginBottom="25dp"
         android:text="This Week" />
 
 </RelativeLayout>

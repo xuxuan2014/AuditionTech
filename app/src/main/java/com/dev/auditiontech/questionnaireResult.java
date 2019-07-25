@@ -43,7 +43,7 @@ public class questionnaireResult extends AppCompatActivity {
         else if (questionnaire.loss == 2)
             resultQuestion2.setText("No");
         else if (questionnaire.loss == 3)
-            resultQuestion2.setText("I don't know");
+            resultQuestion2.setText("Unknown by user");
 
     }
 

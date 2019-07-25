@@ -41,7 +41,16 @@ public class signin extends AppCompatActivity {
         loginForget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // not sure yet
+                String email = loginEmail.getText().toString().trim();
+                firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(signin.this, "Email sent", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
             }
         });
 
@@ -82,4 +91,6 @@ public class signin extends AppCompatActivity {
         loginForget = (Button) findViewById(R.id.loginFORGET);
         firebaseAuth = FirebaseAuth.getInstance();
     }
+
+
 }

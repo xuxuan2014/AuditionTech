@@ -20,14 +20,11 @@
     </ScrollView>
 
     <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="379dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="0dp"
+        android:id="@+id/imageView"
         android:scaleType="fitXY"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:srcCompat="@drawable/education1" />
+
 
 </RelativeLayout>

@@ -18,6 +18,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -168,7 +171,7 @@ public class meter extends AppCompatActivity {
         }
     };
 
-    private int BASE = 1;
+    private double BASE = 0.8;
     private int SPACE = 1000;
 
     public void updateMicStatus() {
@@ -185,7 +188,8 @@ public class meter extends AppCompatActivity {
                 String date = getDate();
                 int sec = getHour()*3600 + getMinute()*60+getSecond();
                 String secStr = Integer.toString(sec);
-                mDatabase.child(date).child(secStr).setValue(db);
+                String name = getID();
+                mDatabase.child(name).child(date).child(secStr).setValue(db);
 
                 meterDB.setText(Integer.toString(db));
                 //Toast.makeText(this, "Decibel" + db, Toast.LENGTH_SHORT).show();
@@ -236,6 +240,12 @@ public class meter extends AppCompatActivity {
         Calendar calendar1 = Calendar.getInstance();
         int second = calendar1.get(Calendar.SECOND);
         return second;
+    }
+
+    public String getID() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user.getUid();
+        return uid;
     }
 
 }

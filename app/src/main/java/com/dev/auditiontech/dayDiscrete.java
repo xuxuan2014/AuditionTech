@@ -5,13 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.YAxis;
@@ -30,25 +27,21 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
-public class history extends AppCompatActivity {
+public class dayDiscrete extends AppCompatActivity {
 
-    private static final String TAG = "History";
-    private LineChart mpLineChart;
-    private Button historyDayDiscrete;
-    private Button historyDayCumulative;
-    private Button historyWeekCumulative;
-    int exposure;
+    private LineChart DDLineChart;
+    private Button DDDayCumulative;
+    private Button DDWeekCumulative;
 
     DatabaseReference mReference;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history);
-        getSupportActionBar().setTitle("Day Cumulative");
+        setContentView(R.layout.activity_day_discrete);
+
+        getSupportActionBar().setTitle("Day Discrete");
         Firebase.setAndroidContext(this);
         setupUIViews();
         Calendar calendar1 = Calendar.getInstance();
@@ -58,13 +51,12 @@ public class history extends AppCompatActivity {
         mReference = FirebaseDatabase.getInstance().getReference(getID()).child(date);
         plot();
 
-        historyDayDiscrete.setOnClickListener(new View.OnClickListener() {
+        DDDayCumulative.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openDD();
+                openHistory();
             }
         });
-
     }
 
     private void plot() {
@@ -88,17 +80,7 @@ public class history extends AppCompatActivity {
 
                     secCount++;
                     int decibel = ds.getValue(Integer.class);
-
-                    double reference =(8/(Math.pow(2, (decibel-90)/5)));
-                    double ratio = 1/(3600*reference) * Math.pow(10,7);
-                    Log.d(TAG, Double.toString(ratio));
-
-                    //Toast.makeText(history.this,Double.toString(secExposure), Toast.LENGTH_SHORT).show();
-
-                    int intSecExposure = (int)Math.round(ratio);
-                    exposure = exposure + intSecExposure;
-
-                    dataValues1.add(new Entry(secCount, exposure));
+                    dataValues1.add(new Entry(secCount, decibel));
 
 
                 }
@@ -106,13 +88,15 @@ public class history extends AppCompatActivity {
                 ArrayList<ILineDataSet> dataSets = new ArrayList<>();
                 dataSets.add(lineDataSet1);
                 LineData data = new LineData(dataSets);
-                YAxis yAxis = mpLineChart.getAxisLeft();
-                yAxis.setAxisMaximum(10000000f);
+                YAxis yAxis = DDLineChart.getAxisLeft();
+                yAxis.setAxisMaximum(140f);
                 yAxis.setMinWidth(0f);
-                Description description = mpLineChart.getDescription();
-                description.setText("Daily Cumulative Exposure");
-                mpLineChart.setData(data);
-                mpLineChart.invalidate();
+                Description description = DDLineChart.getDescription();
+                description.setText("Daily Noise Level");
+
+                DDLineChart.setData(data);
+                DDLineChart.invalidate();
+
 
             }
 
@@ -126,9 +110,9 @@ public class history extends AppCompatActivity {
 
 
     private void setupUIViews() {
-        mpLineChart = findViewById(R.id.lineChart);
-        historyDayDiscrete = findViewById(R.id.historyDayDiscrete);
-        historyWeekCumulative = findViewById(R.id.historyWeekCumulative);
+        DDLineChart = findViewById(R.id.DDLineChart);
+        DDDayCumulative = findViewById(R.id.DDDayCumulative);
+        DDWeekCumulative = findViewById(R.id.DDWeekCumulative);
     }
 
     private String getID() {
@@ -137,9 +121,9 @@ public class history extends AppCompatActivity {
         return uid;
     }
 
-
-    public void openDD() {
-        Intent intent = new Intent(history.this, dayDiscrete.class);
+    private void openHistory() {
+        Intent intent = new Intent(dayDiscrete.this, history.class);
         startActivity(intent);
     }
+
 }
