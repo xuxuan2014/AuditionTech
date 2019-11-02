@@ -86,7 +86,7 @@ public class test extends AppCompatActivity {
         mpLineChart = findViewById(R.id.lineChart);
         historyDayDiscrete = findViewById(R.id.historyDayDiscrete);
 
-        historyWeekCumulative = findViewById(R.id.historyWeekCumulative);
+        //historyWeekCumulative = findViewById(R.id.historyWeekCumulative);
     }
 
     private ArrayList<Entry> dataValues1() {

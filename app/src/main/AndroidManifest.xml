@@ -28,6 +28,7 @@
         <activity android:name=".homepage" />
         <activity android:name=".signup" />
         <activity android:name=".signin" />
+        <activity android:name=".dayVolume"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

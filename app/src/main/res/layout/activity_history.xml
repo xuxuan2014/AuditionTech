@@ -22,15 +22,14 @@
         android:text="By hour" />
 
 
-
     <Button
-        android:id="@+id/historyWeekCumulative"
+        android:id="@+id/volumeDay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="249dp"
         android:layout_marginBottom="25dp"
-        android:text="This Week" />
+        android:text="Volume" />
 
 </RelativeLayout>
