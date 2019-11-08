@@ -8,9 +8,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaRecorder;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -33,22 +35,37 @@ public class MonitorService extends Service {
     private int notificationID = 114514;
     private MediaRecorder mediaRecorder;
     private VolumeChangeObserver mVolumeChangeObserver;
+    private Calendar calendar;
+    public static final double BASE = 0.8;
+    public static final int INTERVAL = 1000;
+    private int db;
     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+    private final IBinder binder = new LocalBinder();
+    private FirebaseUser user;
 
-    public MonitorService() {
+    public class LocalBinder extends Binder {
+        MonitorService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return MonitorService.this;
+        }
     }
-
     @Override
     public void onCreate() {
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         channelId = getString(R.string.notification_channel_id);
         createNotificationChannel();
         nCB = new NotificationCompat.Builder(this, channelId);
+        calendar = Calendar.getInstance();
         initNotification();
         initMediaRecorder();
 
-        // TODO: start recording and monitoring
         startMonitoring();
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateMicStatus();
+            }
+        }, INTERVAL);
 
     }
 
@@ -80,7 +97,6 @@ public class MonitorService extends Service {
             e.printStackTrace();
         }
 
-        //TODO：add volume change update in notification
     }
 
     private void createNotificationChannel() {
@@ -111,9 +127,7 @@ public class MonitorService extends Service {
                 .setPriority(Notification.PRIORITY_MAX)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false);
-
-        nm.notify(notificationID, nCB.build());
-
+        startForeground(notificationID, nCB.build());
     }
 
     @Override
@@ -139,75 +153,66 @@ public class MonitorService extends Service {
             mediaRecorder = null;
 
         }
+
+        stopForeground(true);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-
-        // TODO: figure out how to bind back to meter
-        return null;
+        return binder;
     }
 
-    private final Handler mHandler = new Handler();
-    private Runnable mUpdateMicStatusTimer = new Runnable() {
-        public void run() {
-            updateMicStatus();
-        }
-    };
+    public int getDb() {
+        return db;
+    }
 
-    private double BASE = 0.8;
-    private int SPACE = 1000;
 
-    //TODO: the mic status now pass in from MonitorService
+    // TODO: check if the logic works
     public void updateMicStatus() {
         if (mediaRecorder != null) {
 
-            double amplitude = (double)mediaRecorder.getMaxAmplitude();
-            double ratio = amplitude /BASE;
+            double amplitude = (double) mediaRecorder.getMaxAmplitude();
+            double ratio = amplitude / BASE;
 
-            if (ratio > 1)
-            {
-                // TODO: is decibel necessary or redundant?
+            if (ratio > 1) {
                 double decibel = 20 * Math.log10(ratio);
-                int db = (int) decibel;
+                db = (int) decibel;
 
                 String date = getDate();
-                int sec = getHour()*3600 + getMinute()*60+getSecond();
+                int sec = getHour() * 3600 + getMinute() * 60 + getSecond();
                 String secStr = Integer.toString(sec);
                 String name = getID();
                 mDatabase.child(name).child(date).child(secStr).setValue(db);
+                nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
+                nm.notify(notificationID, nCB.build());
             }
             //Log.d(TAG,"amplitude:"+amplitude);
-            mHandler.postDelayed(mUpdateMicStatusTimer, SPACE);
         }
     }
 
 
     public String getDate() {
-        Calendar calendar1 = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-
-        return simpleDateFormat.format(calendar1.getTime());
+        return simpleDateFormat.format(calendar.getTime());
     }
 
     public Integer getHour() {
-        Calendar calendar1 = Calendar.getInstance();
-        int hour = calendar1.get(Calendar.HOUR_OF_DAY);
-        return hour;
+        return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
     public Integer getMinute() {
-        Calendar calendar1 = Calendar.getInstance();
-        return calendar1.get(Calendar.MINUTE);
+        return calendar.get(Calendar.MINUTE);
     }
 
     public Integer getSecond() {
-        Calendar calendar1 = Calendar.getInstance();
-        return calendar1.get(Calendar.SECOND);
+        return calendar.get(Calendar.SECOND);
     }
 
+    // TODO: change ID into whatever passed in
     public String getID() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            user = FirebaseAuth.getInstance().getCurrentUser();
+        }
         return user.getUid();
     }
 }
