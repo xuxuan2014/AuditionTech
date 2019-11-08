@@ -43,9 +43,9 @@ public class meter extends AppCompatActivity {
     private TextView meterReminder;
     private String pathSave = "";
     MediaRecorder mediaRecorder;
-    MediaPlayer mediaPlayer;
-    private final String TAG = "MediaRecord";
-    public static final int MAX_LENGTH = 1000 * 60 * 10;
+//    MediaPlayer mediaPlayer;
+//    private final String TAG = "MediaRecord";
+//    public static final int MAX_LENGTH = 1000 * 60 * 10;
 
     final int REQUEST_PERMISSION_CODE = 1000;
 

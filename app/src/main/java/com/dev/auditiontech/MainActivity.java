@@ -37,10 +37,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mVolumeChangeObserver = new VolumeChangeObserver(this, new Handler());
-        getApplicationContext().getContentResolver()
-                .registerContentObserver(android.provider.Settings.System.CONTENT_URI,
-                        true, mVolumeChangeObserver);
     }
 
     private void setupUIViews() {

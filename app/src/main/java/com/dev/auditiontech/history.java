@@ -66,13 +66,13 @@ public class history extends AppCompatActivity {
             }
         });
 
-        volumeDay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(history.this, dayVolume.class);
-                startActivity(intent);
-            }
-        });
+//        volumeDay.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(history.this, dayVolume.class);
+//                startActivity(intent);
+//            }
+//        });
 
     }
 
