@@ -68,6 +68,7 @@ public class meter extends AppCompatActivity {
                     //pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() +
                     //        "/" + UUID.randomUUID().toString() + "_audio_record.3gp";
 
+                    // TODO: move recording logic into MonitorService
                     pathSave = "/dev/null";
 
 
@@ -174,6 +175,7 @@ public class meter extends AppCompatActivity {
     private double BASE = 0.8;
     private int SPACE = 1000;
 
+    //TODO: the mic status now pass in from MonitorService
     public void updateMicStatus() {
         if (mediaRecorder != null) {
 
