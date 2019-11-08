@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
@@ -38,11 +39,17 @@ public class MonitorService extends Service {
     private Calendar calendar;
     public static final double BASE = 0.8;
     public static final int INTERVAL = 1000;
-    private int db;
+    private int db = 30;
     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
     private final IBinder binder = new LocalBinder();
     private FirebaseUser user;
-
+    private Handler mHandler;
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateMicStatus();
+        }
+    };
     public class LocalBinder extends Binder {
         MonitorService getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -60,12 +67,8 @@ public class MonitorService extends Service {
         initMediaRecorder();
 
         startMonitoring();
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                updateMicStatus();
-            }
-        }, INTERVAL);
+        mHandler = new Handler(Looper.getMainLooper());
+        mHandler.postDelayed(mRunnable, INTERVAL);
 
     }
 
@@ -79,6 +82,7 @@ public class MonitorService extends Service {
         //TODO determine how to save media path.
         String pathSave = "/dev/null";
         mediaRecorder.setOutputFile(pathSave);
+        Log.e("mediaRecorder","mediaRecorder initialized.");
     }
 
     private void startMonitoring() {
@@ -90,6 +94,7 @@ public class MonitorService extends Service {
                         true, mVolumeChangeObserver);
 
         try {
+            Log.e("monitoring","get into try loop");
             mediaRecorder.prepare();
             mediaRecorder.start();
             Toast.makeText(this, "Measuring...", Toast.LENGTH_SHORT).show();
@@ -186,8 +191,9 @@ public class MonitorService extends Service {
                 nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
                 nm.notify(notificationID, nCB.build());
             }
-            //Log.d(TAG,"amplitude:"+amplitude);
+            Log.d("mic","amplitude:"+amplitude);
         }
+        mHandler.postDelayed(mRunnable, INTERVAL);
     }
 
 

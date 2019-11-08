@@ -38,23 +38,14 @@ import android.util.Log;
 
 public class meter extends AppCompatActivity {
 
-
-    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-
-
     int db;
     private Button meterStart;
     private Button meterStop;
     private TextView meterDB;
     private TextView meterReminder;
-    private String pathSave = "";
-    MediaRecorder mediaRecorder;
     boolean mBound;
     MonitorService mService;
     private Intent intent;
-    MediaPlayer mediaPlayer;
-    private final String TAG = "MediaRecord";
-    public static final int MAX_LENGTH = 1000 * 60 * 10;
 
     final int REQUEST_PERMISSION_CODE = 1000;
     public static final int INTERVAL = 1000;
@@ -101,6 +92,7 @@ public class meter extends AppCompatActivity {
             meterReminder.setText("Please leave in 2 minutes/take hearing protection measures/lower the volume or your hearing could be damaged");
             meterReminder.setTextColor(Color.rgb(139, 0, 0));
         }
+        mHandler.postDelayed(mUpdateMicStatusTimer, INTERVAL);
     }
 
     @Override
@@ -120,20 +112,6 @@ public class meter extends AppCompatActivity {
 
                 if (checkPermissionFromDevice()) {
 
-                    //pathSave = Environment.getExternalStorageDirectory().getAbsolutePath() +
-                    //        "/" + UUID.randomUUID().toString() + "_audio_record.3gp";
-
-//                    pathSave = "/dev/null";
-//
-//
-//                    //setupMediaRecorder();
-//                    try {
-//                        mediaRecorder.prepare();
-//                        mediaRecorder.start();
-//                        Toast.makeText(meter.this, "Measuring...", Toast.LENGTH_SHORT).show();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
                     startMonitorService();
                     meterStart.setEnabled(false);
                     meterStop.setEnabled(true);
@@ -142,28 +120,13 @@ public class meter extends AppCompatActivity {
                     requestPermissions();
                 }
 
-                //updateMicStatus();
-
-
             }
         });
 
         meterStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (mediaRecorder != null) {
-//                    try {
-//                        mediaRecorder.stop();
-//                    } catch (IllegalStateException e) {
-//
-//                        //e.printStackTrace();
-//                        mediaRecorder = null;
-//                        mediaRecorder = new MediaRecorder();
-//                    }
-//                    mediaRecorder.release();
-//                    mediaRecorder = null;
-//
-//                }
+
                 stopMonitorService();
                 meterStart.setEnabled(true);
                 meterStop.setEnabled(false);
@@ -195,15 +158,6 @@ public class meter extends AppCompatActivity {
         meterDB = findViewById(R.id.meterDB);
         meterReminder = findViewById(R.id.meterREMINDER);
     }
-
-//    private void setupMediaRecorder() {
-//        mediaRecorder = new MediaRecorder();
-//        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//        mediaRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-//        mediaRecorder.setOutputFile(pathSave);
-//    }
-
 
     @Override
     protected void onStop() {
@@ -241,90 +195,5 @@ public class meter extends AppCompatActivity {
         return write_external_storage_result == PackageManager.PERMISSION_GRANTED &&
                 record_audio_result == PackageManager.PERMISSION_GRANTED;
     }
-
-//
-//    private final Handler mHandler = new Handler();
-//    private Runnable mUpdateMicStatusTimer = new Runnable() {
-//        public void run() {
-//            updateMicStatus();
-//        }
-//    };
-
-//    private double BASE = 0.8;
-//    private int SPACE = 1000;
-//
-//    public void updateMicStatus() {
-//        if (mediaRecorder != null) {
-//
-//            double amplitude = (double)mediaRecorder.getMaxAmplitude();
-//            double ratio = amplitude /BASE;
-//
-//            if (ratio > 1)
-//            {
-//                double decibel = 20 * Math.log10(ratio);
-//                db = (int)decibel;
-//
-//                String date = getDate();
-//                int sec = getHour()*3600 + getMinute()*60+getSecond();
-//                String secStr = Integer.toString(sec);
-//                String name = getID();
-//                mDatabase.child(name).child(date).child(secStr).setValue(db);
-//
-//                meterDB.setText(Integer.toString(db));
-//                //Toast.makeText(this, "Decibel" + db, Toast.LENGTH_SHORT).show();
-//                if (db < 80) {
-//                    meterReminder.setText("You are in a safe listening environment.");
-//                    meterReminder.setTextColor(Color.BLACK);
-//                }
-//                else if (80<=db && db<85) {
-//                    meterReminder.setText("Please leave in 7-8 hours/take hearing protection measures/lower the volume or your hearing could be damaged.");
-//                    meterReminder.setTextColor(Color.rgb(0,128,0));
-//                }
-//                else if (db>=85 && db<100) {
-//                    meterReminder.setText("Please leave in 15 minutes/take hearing protection measures/lower the volume or your hearing could be damaged");
-//                    meterReminder.setTextColor(Color.rgb(255,0,0));
-//                }
-//                else if (db > 100) {
-//                    meterReminder.setText("Please leave in 2 minutes/take hearing protection measures/lower the volume or your hearing could be damaged");
-//                    meterReminder.setTextColor(Color.rgb(139,0,0));
-//                }
-//            }
-//            //Log.d(TAG,"amplitude:"+amplitude);
-//            mHandler.postDelayed(mUpdateMicStatusTimer, SPACE);
-//        }
-//    }
-
-//
-//    public String getDate() {
-//        Calendar calendar1 = Calendar.getInstance();
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-//
-//        String date = simpleDateFormat.format(calendar1.getTime());
-//        return date;
-//    }
-//
-//    public Integer getHour() {
-//        Calendar calendar1 = Calendar.getInstance();
-//        int hour = calendar1.get(Calendar.HOUR_OF_DAY);
-//        return hour;
-//    }
-//
-//    public Integer getMinute() {
-//        Calendar calendar1 = Calendar.getInstance();
-//        int minute = calendar1.get(Calendar.MINUTE);
-//        return minute;
-//    }
-//
-//    public Integer getSecond() {
-//        Calendar calendar1 = Calendar.getInstance();
-//        int second = calendar1.get(Calendar.SECOND);
-//        return second;
-//    }
-//
-//    public String getID() {
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        String uid = user.getUid();
-//        return uid;
-//    }
 
 }
