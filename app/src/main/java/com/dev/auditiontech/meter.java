@@ -75,6 +75,7 @@ public class meter extends AppCompatActivity {
     };
 
     // TODO: decide what method should be used to pass db value back to meter activity
+    // Now I use a public method from service but there's lagging due to asynchronous.
     private void updateUI() {
         db = mService.getDb();
         meterDB.setText(Integer.toString(db));

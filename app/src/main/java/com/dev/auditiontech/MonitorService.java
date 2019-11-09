@@ -50,12 +50,14 @@ public class MonitorService extends Service {
             updateMicStatus();
         }
     };
+
     public class LocalBinder extends Binder {
         MonitorService getService() {
             // Return this instance of LocalService so clients can call public methods
             return MonitorService.this;
         }
     }
+
     @Override
     public void onCreate() {
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -82,7 +84,7 @@ public class MonitorService extends Service {
         //TODO determine how to save media path.
         String pathSave = "/dev/null";
         mediaRecorder.setOutputFile(pathSave);
-        Log.e("mediaRecorder","mediaRecorder initialized.");
+        Log.e("mediaRecorder", "mediaRecorder initialized.");
     }
 
     private void startMonitoring() {
@@ -94,7 +96,7 @@ public class MonitorService extends Service {
                         true, mVolumeChangeObserver);
 
         try {
-            Log.e("monitoring","get into try loop");
+            Log.e("monitoring", "get into try loop");
             mediaRecorder.prepare();
             mediaRecorder.start();
             Toast.makeText(this, "Measuring...", Toast.LENGTH_SHORT).show();
@@ -122,21 +124,28 @@ public class MonitorService extends Service {
 
     private void initNotification() {
 
-        Intent intent = new Intent(this, meter.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        Intent meterIntent = new Intent(this, meter.class);
+        meterIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingStartMeterIntent = PendingIntent.getActivity(this, 0, meterIntent, 0);
 
+        Intent monitorIntent = new Intent(this, MonitorService.class).setAction(getString(R.string.stop_monitor_action_command));
+        PendingIntent pendingStopMonitorIntent = PendingIntent.getService(this, 0, monitorIntent, 0);
         nCB.setSmallIcon(R.drawable.ic_hearing_24px)
                 .setContentTitle(getString(R.string.notification_title_default) + "0 db")
                 .setWhen(System.currentTimeMillis())
                 .setPriority(Notification.PRIORITY_MAX)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(false);
+                .setContentIntent(pendingStartMeterIntent)
+                .setAutoCancel(false)
+                .addAction(R.drawable.ic_mic_off_24px, "Stop monitoring", pendingStopMonitorIntent);
         startForeground(notificationID, nCB.build());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent.getAction() != null && intent.getAction().equals(getString(R.string.stop_monitor_action_command))) {
+            stopForeground(true);
+            stopSelf();
+        }
         return START_STICKY;
     }
 
@@ -191,7 +200,7 @@ public class MonitorService extends Service {
                 nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
                 nm.notify(notificationID, nCB.build());
             }
-            Log.d("mic","amplitude:"+amplitude);
+            Log.d("mic", "amplitude:" + amplitude);
         }
         mHandler.postDelayed(mRunnable, INTERVAL);
     }
