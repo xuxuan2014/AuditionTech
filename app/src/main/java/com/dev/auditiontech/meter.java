@@ -114,8 +114,7 @@ public class meter extends AppCompatActivity {
                 if (checkPermissionFromDevice()) {
 
                     startMonitorService();
-                    meterStart.setEnabled(false);
-                    meterStop.setEnabled(true);
+
 
                 } else {
                     requestPermissions();
@@ -127,16 +126,14 @@ public class meter extends AppCompatActivity {
         meterStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 stopMonitorService();
-                meterStart.setEnabled(true);
-                meterStop.setEnabled(false);
-
                 //mediaRecorder.stop();
-
             }
         });
 
+        if (MonitorService.service != null) {
+            startMonitorService();
+        }
     }
 
     private void stopMonitorService() {
@@ -144,6 +141,8 @@ public class meter extends AppCompatActivity {
         unbindService(connection);
         stopService(intent);
         mBound = false;
+        meterStart.setEnabled(true);
+        meterStop.setEnabled(false);
     }
 
     private void startMonitorService() {
@@ -151,6 +150,8 @@ public class meter extends AppCompatActivity {
         startService(intent);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         mHandler.postDelayed(mUpdateMicStatusTimer, INTERVAL);
+        meterStart.setEnabled(false);
+        meterStop.setEnabled(true);
     }
 
     private void setupUIViews() {

@@ -29,6 +29,8 @@ import java.util.Calendar;
 
 public class MonitorService extends Service {
 
+    public static MonitorService service;
+
     private NotificationManager nm;
     private NotificationCompat.Builder nCB;
     private String channelId;
@@ -71,6 +73,7 @@ public class MonitorService extends Service {
         startMonitoring();
         mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(mRunnable, INTERVAL);
+        MonitorService.service = this;
 
     }
 
@@ -169,6 +172,7 @@ public class MonitorService extends Service {
         }
 
         stopForeground(true);
+        MonitorService.service = null;
     }
 
     @Override
