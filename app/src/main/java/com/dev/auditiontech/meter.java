@@ -99,13 +99,53 @@ public class meter extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meter);
-        getSupportActionBar().setTitle("Decibel Meter");
-
-        setupUIViews();
         intent = new Intent(this, MonitorService.class);
         if (!checkPermissionFromDevice())
             requestPermissions();
+        setupUIViews();
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (MonitorService.service != null) {
+            startMonitorService();
+        } else {
+            stopMonitorService();
+        }
+    }
+
+    private void stopMonitorService() {
+        mHandler.removeCallbacks(mUpdateMicStatusTimer);
+        if (MonitorService.service != null) {
+            unbindService(connection);
+            stopService(intent);
+        }
+        mBound = false;
+        setupUIViews();
+        meterStart.setEnabled(true);
+        meterStop.setEnabled(false);
+    }
+
+    private void startMonitorService() {
+
+        startService(intent);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        mHandler.postDelayed(mUpdateMicStatusTimer, INTERVAL);
+        meterStart.setEnabled(false);
+        meterStop.setEnabled(true);
+    }
+
+    private void setupUIViews() {
+        setContentView(R.layout.activity_meter);
+        getSupportActionBar().setTitle("Decibel Meter");
+        meterStart = findViewById(R.id.btnRecord);
+        meterStop = findViewById(R.id.btnStopRecord);
+        meterDB = findViewById(R.id.meterDB);
+        meterReminder = findViewById(R.id.meterREMINDER);
+
         meterStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,35 +170,6 @@ public class meter extends AppCompatActivity {
                 //mediaRecorder.stop();
             }
         });
-
-        if (MonitorService.service != null) {
-            startMonitorService();
-        }
-    }
-
-    private void stopMonitorService() {
-        mHandler.removeCallbacks(mUpdateMicStatusTimer);
-        unbindService(connection);
-        stopService(intent);
-        mBound = false;
-        meterStart.setEnabled(true);
-        meterStop.setEnabled(false);
-    }
-
-    private void startMonitorService() {
-
-        startService(intent);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        mHandler.postDelayed(mUpdateMicStatusTimer, INTERVAL);
-        meterStart.setEnabled(false);
-        meterStop.setEnabled(true);
-    }
-
-    private void setupUIViews() {
-        meterStart = findViewById(R.id.btnRecord);
-        meterStop = findViewById(R.id.btnStopRecord);
-        meterDB = findViewById(R.id.meterDB);
-        meterReminder = findViewById(R.id.meterREMINDER);
     }
 
     @Override
