@@ -53,7 +53,7 @@ public class MonitorService extends Service {
         }
     };
 
-    public class LocalBinder extends Binder {
+    class LocalBinder extends Binder {
         MonitorService getService() {
             // Return this instance of LocalService so clients can call public methods
             return MonitorService.this;
@@ -139,6 +139,7 @@ public class MonitorService extends Service {
                 .setPriority(Notification.PRIORITY_MAX)
                 .setContentIntent(pendingStartMeterIntent)
                 .setAutoCancel(false)
+                .setOnlyAlertOnce(true)
                 .addAction(R.drawable.ic_mic_off_24px, "Stop monitoring", pendingStopMonitorIntent);
         startForeground(notificationID, nCB.build());
     }
