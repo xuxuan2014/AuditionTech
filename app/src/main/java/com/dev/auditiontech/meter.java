@@ -62,6 +62,11 @@ public class meter extends AppCompatActivity {
         }
 
         @Override
+        public void onBindingDied(ComponentName name) {
+            stopMonitorService();
+        }
+
+        @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mBound = false;
         }
@@ -124,6 +129,7 @@ public class meter extends AppCompatActivity {
             stopService(intent);
         }
         mBound = false;
+        mService = null;
         setupUIViews();
         meterStart.setEnabled(true);
         meterStop.setEnabled(false);
@@ -132,7 +138,9 @@ public class meter extends AppCompatActivity {
     private void startMonitorService() {
 
         startService(intent);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        // TODO:Test which one does not allow auto create.
+        bindService(intent, connection, 0);
         mHandler.postDelayed(mUpdateMicStatusTimer, INTERVAL);
         meterStart.setEnabled(false);
         meterStop.setEnabled(true);
@@ -179,6 +187,7 @@ public class meter extends AppCompatActivity {
             mHandler.removeCallbacks(mUpdateMicStatusTimer);
             unbindService(connection);
             mBound = false;
+            mService = null;
         }
     }
 
