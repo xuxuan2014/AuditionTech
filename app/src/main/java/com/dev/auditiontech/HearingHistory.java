@@ -8,10 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.YAxis;
@@ -30,9 +28,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
-public class history extends AppCompatActivity {
+public class HearingHistory extends AppCompatActivity {
 
     private static final String TAG = "History";
     private LineChart mpLineChart;
@@ -69,7 +66,7 @@ public class history extends AppCompatActivity {
 //        volumeDay.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                Intent intent = new Intent(history.this, dayVolume.class);
+//                Intent intent = new Intent(HearingHistory.this, dayVolume.class);
 //                startActivity(intent);
 //            }
 //        });
@@ -102,7 +99,7 @@ public class history extends AppCompatActivity {
                     double ratio = 1/(3600*reference) * Math.pow(10,7);
                     Log.d(TAG, Double.toString(ratio));
 
-                    //Toast.makeText(history.this,Double.toString(secExposure), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(HearingHistory.this,Double.toString(secExposure), Toast.LENGTH_SHORT).show();
 
                     int intSecExposure = (int)Math.round(ratio);
                     exposure = exposure + intSecExposure;
@@ -148,7 +145,7 @@ public class history extends AppCompatActivity {
 
 
     public void openDD() {
-        Intent intent = new Intent(history.this, dayDiscrete.class);
+        Intent intent = new Intent(HearingHistory.this, dayDiscrete.class);
         startActivity(intent);
     }
 }

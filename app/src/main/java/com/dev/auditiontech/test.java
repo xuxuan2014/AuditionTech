@@ -115,17 +115,17 @@ public class test extends AppCompatActivity {
     }
 
 //    private void openDayDiscrete() {
-//        Intent intent = new Intent(history.this, dayDiscrete.class);
+//        Intent intent = new Intent(HearingHistory.this, dayDiscrete.class);
 //        startActivity(intent);
 //    }
 //
 //    private void openDayCumulative() {
-//        Intent intent = new Intent(history.this, dayCumulative.class);
+//        Intent intent = new Intent(HearingHistory.this, dayCumulative.class);
 //        startActivity(intent);
 //    }
 //
 //    private void openWeekCumulative() {
-//        Intent intent = new Intent(history.this, weekCumulative.class);
+//        Intent intent = new Intent(HearingHistory.this, weekCumulative.class);
 //        startActivity(intent);
 //    }
 

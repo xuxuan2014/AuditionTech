@@ -122,7 +122,7 @@ public class dayDiscrete extends AppCompatActivity {
     }
 
     private void openHistory() {
-        Intent intent = new Intent(dayDiscrete.this, history.class);
+        Intent intent = new Intent(dayDiscrete.this, HearingHistory.class);
         startActivity(intent);
     }
 
