@@ -115,7 +115,7 @@ public class test extends AppCompatActivity {
     }
 
 //    private void openDayDiscrete() {
-//        Intent intent = new Intent(HearingHistory.this, dayDiscrete.class);
+//        Intent intent = new Intent(HearingHistory.this, DayDiscrete.class);
 //        startActivity(intent);
 //    }
 //

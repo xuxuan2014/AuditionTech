@@ -53,7 +53,8 @@ public class HearingHistory extends AppCompatActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 
         String date = simpleDateFormat.format(calendar1.getTime());
-        mReference = FirebaseDatabase.getInstance().getReference(getID()).child(date);
+        mReference = FirebaseDatabase.getInstance().getReference(getID())
+                .child(getString(R.string.firebase_keyword_ambient_volume)).child(date);
         plot();
 
         historyDayDiscrete.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +67,7 @@ public class HearingHistory extends AppCompatActivity {
 //        volumeDay.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                Intent intent = new Intent(HearingHistory.this, dayVolume.class);
+//                Intent intent = new Intent(HearingHistory.this, MediaVolume.class);
 //                startActivity(intent);
 //            }
 //        });
@@ -145,7 +146,7 @@ public class HearingHistory extends AppCompatActivity {
 
 
     public void openDD() {
-        Intent intent = new Intent(HearingHistory.this, dayDiscrete.class);
+        Intent intent = new Intent(HearingHistory.this, DayDiscrete.class);
         startActivity(intent);
     }
 }

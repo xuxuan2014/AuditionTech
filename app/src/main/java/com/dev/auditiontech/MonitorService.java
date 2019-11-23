@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.os.Binder;
 import android.os.Build;
@@ -24,7 +23,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MonitorService extends Service {
@@ -38,7 +36,7 @@ public class MonitorService extends Service {
     private int notificationID = 114514;
     private MediaRecorder mediaRecorder;
     private VolumeChangeObserver mVolumeChangeObserver;
-    private Calendar calendar;
+    private Calendar calendar = Calendar.getInstance();
     public static final double BASE = 0.8;
     public static final int INTERVAL = 1000;
     private int db = 30;
@@ -66,7 +64,6 @@ public class MonitorService extends Service {
         channelId = getString(R.string.notification_channel_id);
         createNotificationChannel();
         nCB = new NotificationCompat.Builder(this, channelId);
-        calendar = Calendar.getInstance();
         initNotification();
         initMediaRecorder();
 
@@ -197,12 +194,16 @@ public class MonitorService extends Service {
                 double decibel = 20 * Math.log10(ratio);
                 db = (int) decibel;
 
-                String date = getDate();
-                int sec = getHour() * 3600 + getMinute() * 60 + getSecond();
-                String secStr = Integer.toString(sec);
-                String name = getID();
-                mDatabase.child(name).child(date).child(secStr).setValue(db);
+                String date = TimeUtil.getDate();
+                String currentMillisInString = String.valueOf(System.currentTimeMillis());
+                String id = getID();
+
+                mDatabase.child(id).child("ambient_volume").
+                        child(date).child(currentMillisInString).setValue(db);
                 nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
+
+                //TODO: auto fix size
+                nCB.setContentText(AmbientVolumeUtil.getPrompt(db));
                 nm.notify(notificationID, nCB.build());
             }
             Log.d("mic", "amplitude:" + amplitude);
@@ -210,23 +211,6 @@ public class MonitorService extends Service {
         mHandler.postDelayed(mRunnable, INTERVAL);
     }
 
-
-    public String getDate() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
-        return simpleDateFormat.format(calendar.getTime());
-    }
-
-    public Integer getHour() {
-        return calendar.get(Calendar.HOUR_OF_DAY);
-    }
-
-    public Integer getMinute() {
-        return calendar.get(Calendar.MINUTE);
-    }
-
-    public Integer getSecond() {
-        return calendar.get(Calendar.SECOND);
-    }
 
     // TODO: change ID into whatever passed in
     public String getID() {

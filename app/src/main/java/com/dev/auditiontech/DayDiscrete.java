@@ -11,6 +11,7 @@ import android.widget.Button;
 import com.firebase.client.Firebase;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -28,12 +29,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class dayDiscrete extends AppCompatActivity {
+public class DayDiscrete extends AppCompatActivity {
 
-    private LineChart DDLineChart;
-    private Button DDDayCumulative;
+    private LineChart lineChart;
+    private Button dayCumulativeButton;
     private Button DDWeekCumulative;
-
     DatabaseReference mReference;
 
     @Override
@@ -44,14 +44,14 @@ public class dayDiscrete extends AppCompatActivity {
         getSupportActionBar().setTitle("Day Discrete");
         Firebase.setAndroidContext(this);
         setupUIViews();
-        Calendar calendar1 = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+        setupPlotStyles();
 
-        String date = simpleDateFormat.format(calendar1.getTime());
-        mReference = FirebaseDatabase.getInstance().getReference(getID()).child(date);
+        mReference = FirebaseDatabase.getInstance().getReference(getID())
+                .child(getString(R.string.firebase_keyword_ambient_volume)).child(TimeUtil.getDate());
+
         plot();
 
-        DDDayCumulative.setOnClickListener(new View.OnClickListener() {
+        dayCumulativeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openHistory();
@@ -61,41 +61,28 @@ public class dayDiscrete extends AppCompatActivity {
 
     private void plot() {
 
-
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<Entry> dataValues1 = new ArrayList<Entry>();
 
-                //int i=0;
-
-                Calendar calendar1 = Calendar.getInstance();
-                int hour = calendar1.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar1.get(Calendar.MINUTE);
-                int second = calendar1.get(Calendar.SECOND);
-                int secCount = 3600* hour+60*minute+second;
-
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-
-
-                    secCount++;
                     int decibel = ds.getValue(Integer.class);
-                    dataValues1.add(new Entry(secCount, decibel));
 
-
+                    dataValues1.add(new Entry(Long.parseLong(ds.getKey()), decibel));
                 }
                 final LineDataSet lineDataSet1 = new LineDataSet(dataValues1, "Decibel");
                 ArrayList<ILineDataSet> dataSets = new ArrayList<>();
                 dataSets.add(lineDataSet1);
                 LineData data = new LineData(dataSets);
-                YAxis yAxis = DDLineChart.getAxisLeft();
+                YAxis yAxis = lineChart.getAxisLeft();
                 yAxis.setAxisMaximum(140f);
                 yAxis.setMinWidth(0f);
-                Description description = DDLineChart.getDescription();
+                Description description = lineChart.getDescription();
                 description.setText("Daily Noise Level");
 
-                DDLineChart.setData(data);
-                DDLineChart.invalidate();
+                lineChart.setData(data);
+                lineChart.invalidate();
 
 
             }
@@ -108,10 +95,19 @@ public class dayDiscrete extends AppCompatActivity {
 
     }
 
+    private void setupPlotStyles() {
+
+        lineChart.setScaleEnabled(true);
+        lineChart.setDragEnabled(true);
+        lineChart.setDragDecelerationFrictionCoef(0.9f);
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setGranularity(1000f);
+    }
+
 
     private void setupUIViews() {
-        DDLineChart = findViewById(R.id.DDLineChart);
-        DDDayCumulative = findViewById(R.id.DDDayCumulative);
+        lineChart = findViewById(R.id.DDLineChart);
+        dayCumulativeButton = findViewById(R.id.DDDayCumulative);
         DDWeekCumulative = findViewById(R.id.DDWeekCumulative);
     }
 
@@ -122,7 +118,7 @@ public class dayDiscrete extends AppCompatActivity {
     }
 
     private void openHistory() {
-        Intent intent = new Intent(dayDiscrete.this, HearingHistory.class);
+        Intent intent = new Intent(DayDiscrete.this, HearingHistory.class);
         startActivity(intent);
     }
 

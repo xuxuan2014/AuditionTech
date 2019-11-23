@@ -26,9 +26,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class dayVolume  extends AppCompatActivity {
-    private LineChart VolumeLineChart;
+public class MediaVolume extends AppCompatActivity {
+    private LineChart volumeLineChart;
     DatabaseReference mReference;
+    private Calendar calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +39,10 @@ public class dayVolume  extends AppCompatActivity {
         getSupportActionBar().setTitle("Day Volume");
         Firebase.setAndroidContext(this);
         setupUIViews();
-        Calendar calendar1 = Calendar.getInstance();
+        calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 
-        String date = simpleDateFormat.format(calendar1.getTime());
+        String date = simpleDateFormat.format(calendar.getTime());
         mReference = FirebaseDatabase.getInstance().getReference(getID()).child(date).child("music_volume");
         plot();
     }
@@ -56,50 +57,49 @@ public class dayVolume  extends AppCompatActivity {
 
                 //int i=0;
 
-                Calendar calendar1 = Calendar.getInstance();
-                int hour = calendar1.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar1.get(Calendar.MINUTE);
-                int second = calendar1.get(Calendar.SECOND);
+                // What does this mean???
+
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int minute = calendar.get(Calendar.MINUTE);
+                int second = calendar.get(Calendar.SECOND);
                 int secCount = 3600* hour+60*minute+second;
 
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-
                     Log.w("Firebase",ds.toString());
                     secCount++;
                     int volume = ds.getValue(Integer.class);
                     dataValues1.add(new Entry(secCount, volume));
-
-
                 }
-                final LineDataSet lineDataSet1 = new LineDataSet(dataValues1, "Volume");
-                ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-                dataSets.add(lineDataSet1);
-                LineData data = new LineData(dataSets);
-                YAxis yAxis = VolumeLineChart.getAxisLeft();
+
+                // Styling
+                YAxis yAxis = volumeLineChart.getAxisLeft();
                 yAxis.setAxisMaximum(140f);
                 yAxis.setMinWidth(0f);
-                Description description = VolumeLineChart.getDescription();
+                Description description = volumeLineChart.getDescription();
                 description.setText("Daily Volume Level");
 
-                VolumeLineChart.setData(data);
-                VolumeLineChart.invalidate();
+                // Set data
+                final LineDataSet lineDataSet = new LineDataSet(dataValues1, "Volume");
+                ArrayList<ILineDataSet> dataSet = new ArrayList<>();
+                dataSet.add(lineDataSet);
+                LineData data = new LineData(dataSet);
+                volumeLineChart.setData(data);
 
-
+                volumeLineChart.invalidate();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
 
     }
 
 
     private void setupUIViews() {
-        VolumeLineChart = findViewById(R.id.VolumeLineChart);
+        volumeLineChart = findViewById(R.id.VolumeLineChart);
     }
 
+    // TODO: merge this method together.
     private String getID() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String uid = user.getUid();

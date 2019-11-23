@@ -23,7 +23,7 @@
             android:enabled="true"
             android:exported="true"></service>
 
-        <activity android:name=".dayDiscrete" />
+        <activity android:name=".DayDiscrete" />
         <activity android:name=".questionnaireResult" />
         <activity android:name=".questionnaire" />
         <activity android:name=".test" />
@@ -34,7 +34,7 @@
         <activity android:name=".homepage" />
         <activity android:name=".signup" />
         <activity android:name=".signin" />
-        <activity android:name=".dayVolume" />
+        <activity android:name=".MediaVolume" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

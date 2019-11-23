@@ -94,7 +94,7 @@ public class meter extends AppCompatActivity {
         } else if (db >= 85 && db < 100) {
             meterReminder.setText("Please leave in 15 minutes/take hearing protection measures/lower the volume or your hearing could be damaged");
             meterReminder.setTextColor(Color.rgb(255, 0, 0));
-        } else if (db > 100) {
+        } else {
             meterReminder.setText("Please leave in 2 minutes/take hearing protection measures/lower the volume or your hearing could be damaged");
             meterReminder.setTextColor(Color.rgb(139, 0, 0));
         }
