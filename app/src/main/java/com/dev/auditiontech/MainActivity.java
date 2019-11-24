@@ -1,62 +1,45 @@
 package com.dev.auditiontech;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.View;
-import android.widget.Button;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+
+import android.view.MenuItem;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView MainActivityLogo;
-    private TextView MainActivityTitle;
-    private TextView MainActivityWelcome;
-    private Button buttonLogin;
-    private Button buttonSignUp;
-    private VolumeChangeObserver mVolumeChangeObserver;
+    private TextView mTextMessage;
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    mTextMessage.setText(R.string.title_dashboard);
+                    return true;
+                case R.id.navigation_notifications:
+                    mTextMessage.setText(R.string.title_notifications);
+                    return true;
+            }
+            return false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        getSupportActionBar().setTitle("Welcome");
-        setupUIViews();
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openLoginPage();
-            }
-        });
-
-        buttonSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAgreement();
-            }
-        });
-
+        setContentView(R.layout.activity_main2);
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        mTextMessage = findViewById(R.id.message);
+        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
-
-    private void setupUIViews() {
-        //MainActivityLogo = findViewById(R.id.MainActivityLOGO);
-        MainActivityTitle = findViewById(R.id.MainActivityTITLE);
-        MainActivityWelcome = findViewById(R.id.MainActivityWELCOME);
-        buttonLogin = findViewById(R.id.buttonLOGIN);
-        buttonSignUp = findViewById(R.id.buttonSIGNUP);
-    }
-
-    public void openLoginPage() {
-        Intent intent1 = new Intent(MainActivity.this, signin.class);
-        startActivity(intent1);
-    }
-
-    public void openAgreement() {
-        Intent intent2 = new Intent(MainActivity.this, signup.class);
-        startActivity(intent2);
-
-    }
-
 
 }

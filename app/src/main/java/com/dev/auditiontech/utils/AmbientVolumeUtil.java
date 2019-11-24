@@ -1,4 +1,4 @@
-package com.dev.auditiontech;
+package com.dev.auditiontech.utils;
 
 public class AmbientVolumeUtil {
     public static String getPrompt(int db) {

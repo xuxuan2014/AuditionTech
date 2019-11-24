@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.TextView;
 
 public class profile extends AppCompatActivity {
 
@@ -74,7 +72,7 @@ public class profile extends AppCompatActivity {
     }
 
     public void openMain() {
-        Intent intent3 = new Intent(profile.this, MainActivity.class);
+        Intent intent3 = new Intent(profile.this, OnBoardingActivity.class);
         startActivity(intent3);
     }
 

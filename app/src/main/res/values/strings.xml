@@ -5,5 +5,11 @@
     <string name="stop_monitor_action_command">STOP_MONITOR</string>
     <string name="firebase_keyword_ambient_volume">ambient_volume</string>
     <string name="firebase_keyword_media_volume">media_volume</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
 
 </resources>
