@@ -38,7 +38,6 @@ public class MonitorService extends Service {
     private int notificationID = 114514;
     private MediaRecorder mediaRecorder;
     private VolumeChangeObserver mVolumeChangeObserver;
-    private Calendar calendar = Calendar.getInstance();
     public static final double BASE = 0.8;
     public static final int INTERVAL = 1000;
     private int db = 30;
@@ -126,7 +125,7 @@ public class MonitorService extends Service {
 
     private void initNotification() {
 
-        Intent meterIntent = new Intent(this, meter.class);
+        Intent meterIntent = new Intent(this, MainActivity.class);
         meterIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingStartMeterIntent = PendingIntent.getActivity(this, 0, meterIntent, 0);
 

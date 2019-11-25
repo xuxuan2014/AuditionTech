@@ -30,11 +30,8 @@
         <activity android:name=".DayDiscrete" />
         <activity android:name=".questionnaireResult" />
         <activity android:name=".questionnaire" />
-        <activity android:name=".essentials" />
         <activity android:name=".HearingHistory" />
-        <activity android:name=".meter" />
         <activity android:name=".profile" />
-        <activity android:name=".homepage" />
         <activity android:name=".MediaVolume" />
         <activity android:name=".OnBoardingActivity">
             <intent-filter>

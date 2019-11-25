@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import android.view.MenuItem;
 import android.view.View;
@@ -28,18 +29,24 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_monitor:
-                    mTextMessage.setText(R.string.title_monitor);
-                    return true;
+                    selectedFragment = MeterFragment.getInstance();
+                    break;
                 case R.id.navigation_history:
-                    mTextMessage.setText(R.string.title_history);
-                    return true;
+                    //mTextMessage.setText(R.string.title_history);
+                    break;
                 case R.id.navigation_essentials:
-                    mTextMessage.setText(R.string.title_essentials);
-                    return true;
+                    selectedFragment = EssentialFragment.getInstance();
+                    break;
             }
-            return false;
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main_fragment_container, selectedFragment).commit();
+            }
+
+            return true;
         }
     };
 
@@ -54,12 +61,14 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         mTextMessage = findViewById(R.id.message);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navView.setSelectedItemId(R.id.navigation_monitor);
 
 
         toolbar = findViewById(R.id.main_toolbar);
         mDrawerLayout = findViewById(R.id.main_drawer);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Hearing Aid");
+
 
         final ActionBar actionBar = getSupportActionBar();
 

@@ -38,13 +38,6 @@ public class profile extends AppCompatActivity {
             }
         });
 
-        profileHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openHomepage();
-            }
-        });
-
         profileSignout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,11 +57,6 @@ public class profile extends AppCompatActivity {
     public void openQuestionnaire() {
         Intent intent1 = new Intent(profile.this, questionnaire.class);
         startActivity(intent1);
-    }
-
-    public void openHomepage() {
-        Intent intent2 = new Intent(profile.this, homepage.class);
-        startActivity(intent2);
     }
 
     public void openMain() {
