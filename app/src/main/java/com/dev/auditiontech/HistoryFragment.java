@@ -1,7 +1,6 @@
 package com.dev.auditiontech;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,10 +8,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 public class HistoryFragment extends Fragment implements ToolbarCustomizable {
@@ -34,7 +33,7 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
         if (toolbar == null) {
             toolbar = getActivity().findViewById(R.id.main_toolbar);
         }
-        setHasOptionsMenu(true);
+
         return inflater.inflate(R.layout.fragment_history, container, false);
     }
 
@@ -53,22 +52,16 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
     @Override
     public void setToolbar() {
-        previousToolbarTitle = toolbar.getTitle();
-        //Log.d("fragment", "current toolbar title is " + previousToolbarTitle);
-        toolbar.setTitle("history");
+        previousToolbarTitle = ((AppCompatActivity)getActivity()).getSupportActionBar().getTitle();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
     }
 
     @Override
     public void resetToolbar() {
-        //Log.d("fragment","history fragment onstop is called");
+        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(previousToolbarTitle);
         toolbar.setTitle(previousToolbarTitle);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.toolbar_action_menu, menu);
-        MenuItem calenderButton = menu.findItem(R.id.action_calendar);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
 }
