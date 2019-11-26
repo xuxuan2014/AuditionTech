@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Account:"
+        android:text="Email:"
         android:textCursorDrawable="@null"
         android:fontFamily="Roboto"
         android:textColor="#000000"
