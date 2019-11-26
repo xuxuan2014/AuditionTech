@@ -1,8 +1,10 @@
 package com.dev.auditiontech;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,9 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -87,7 +92,11 @@ public class MeterFragment extends Fragment {
         meterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startMonitorService();
+                if (checkPermissionFromDevice()) {
+                    startMonitorService();
+                } else {
+                    requestPermissions();
+                }
             }
         });
     }
@@ -165,5 +174,32 @@ public class MeterFragment extends Fragment {
             ft.setReorderingAllowed(false);
         }
         ft.detach(this).attach(this).commitAllowingStateLoss();
+    }
+
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(getActivity(), new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO
+        }, REQUEST_PERMISSION_CODE );
+    }
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_CODE: {
+                if (grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    Toast.makeText(getActivity(), "Permission Granted", Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(getActivity(), "Permission Denied", Toast.LENGTH_SHORT).show();
+
+            }
+            break;
+        }
+    }
+
+    private boolean checkPermissionFromDevice() {
+        int write_external_storage_result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int record_audio_result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO);
+        return write_external_storage_result == PackageManager.PERMISSION_GRANTED &&
+                record_audio_result == PackageManager.PERMISSION_GRANTED;
     }
 }

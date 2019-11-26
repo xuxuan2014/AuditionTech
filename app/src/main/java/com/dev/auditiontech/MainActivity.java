@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = MeterFragment.getInstance();
                     break;
                 case R.id.navigation_history:
-                    //mTextMessage.setText(R.string.title_history);
+                    selectedFragment = HistoryFragment.getInstance();
                     break;
                 case R.id.navigation_essentials:
                     selectedFragment = EssentialFragment.getInstance();
