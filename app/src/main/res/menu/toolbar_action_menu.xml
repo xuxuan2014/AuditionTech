@@ -2,8 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_favorite"
+        android:id="@+id/action_calendar"
         android:icon="@drawable/ic_drop_down"
         android:title="Calendar"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="android.widget.CalendarView"/>
 </menu>

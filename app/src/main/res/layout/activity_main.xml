@@ -14,9 +14,9 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/main_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:minHeight="?attr/actionBarSize"
+
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -60,7 +60,7 @@
         app:headerLayout="@layout/nav_header"
         app:itemBackground="@android:color/transparent"
         app:menu="@menu/drawer_view" />
-        />
+
 
 
 </androidx.drawerlayout.widget.DrawerLayout>
