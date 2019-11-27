@@ -5,7 +5,7 @@
     <string name="stop_monitor_action_command">STOP_MONITOR</string>
     <string name="firebase_keyword_ambient_volume">ambient_volume</string>
     <string name="firebase_keyword_media_volume">media_volume</string>
-    <string name="title_activity_main2">MainActivity2</string>
+    <string name="title_activity_main2">Hearing Aid</string>
     <string name="title_monitor">Monitor</string>
     <string name="title_history">History</string>
     <string name="title_essentials">Essentials</string>

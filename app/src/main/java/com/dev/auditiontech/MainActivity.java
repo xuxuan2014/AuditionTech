@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -68,10 +69,12 @@ public class MainActivity extends AppCompatActivity {
         navView.setSelectedItemId(R.id.navigation_monitor);
 
 
-        toolbar = findViewById(R.id.main_toolbar);
+        toolbar = findViewById(R.id.toolbar);
         mDrawerLayout = findViewById(R.id.main_drawer);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Hearing Aid");
+        setTitle("Hearing Aid");
+        ImageView buttonView = findViewById(R.id.date_picker_arrow);
+        buttonView.setImageDrawable(null);
 
 
         final ActionBar actionBar = getSupportActionBar();
@@ -137,5 +140,14 @@ public class MainActivity extends AppCompatActivity {
             super.onBackPressed();
         }
 
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        TextView tvTitle = findViewById(R.id.title);
+
+        if (tvTitle != null) {
+            tvTitle.setText(title);
+        }
     }
 }

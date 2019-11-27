@@ -1,23 +1,38 @@
 package com.dev.auditiontech;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
+
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.google.android.material.appbar.AppBarLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class HistoryFragment extends Fragment implements ToolbarCustomizable {
     public static HistoryFragment instance;
-    public static Toolbar toolbar;
+    //    public static Toolbar toolbar;
     private static CharSequence previousToolbarTitle;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
+    private CompactCalendarView compactCalendarView;
+    private boolean isExpanded;
+    private AppCompatActivity activity;
+    private AppBarLayout appBarLayout;
+    private ImageView arrow;
+    private RelativeLayout datePickerButton;
 
     public static HistoryFragment getInstance() {
         if (instance == null) {
@@ -30,10 +45,11 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        if (toolbar == null) {
-            toolbar = getActivity().findViewById(R.id.main_toolbar);
-        }
-
+//        if (toolbar == null) {
+//            toolbar = getActivity().findViewById(R.id.main_toolbar);
+//        }
+        activity = ((AppCompatActivity) getActivity());
+        appBarLayout = activity.findViewById(R.id.app_bar_layout);
         return inflater.inflate(R.layout.fragment_history, container, false);
     }
 
@@ -52,16 +68,58 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
     @Override
     public void setToolbar() {
-        previousToolbarTitle = ((AppCompatActivity)getActivity()).getSupportActionBar().getTitle();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        previousToolbarTitle = activity.getSupportActionBar().getTitle();
+        compactCalendarView = activity.findViewById(R.id.compactcalendar_view);
+        compactCalendarView.setLocale(TimeZone.getDefault(), /*Locale.getDefault()*/Locale.ENGLISH);
+
+        compactCalendarView.setShouldDrawDaysHeader(true);
+
+        compactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+            @Override
+            public void onDayClick(Date dateClicked) {
+                activity.setTitle(dateFormat.format(dateClicked));
+            }
+
+            @Override
+            public void onMonthScroll(Date firstDayOfNewMonth) {
+                activity.setTitle(dateFormat.format(firstDayOfNewMonth));
+            }
+        });
+
+        setCurrentDate(new Date());
+        arrow = activity.findViewById(R.id.date_picker_arrow);
+        arrow.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_arrow_drop_down));
+        datePickerButton = activity.findViewById(R.id.date_picker_button);
+        datePickerButton.setClickable(true);
+        datePickerButton.setFocusable(true);
+
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                float rotation = isExpanded ? 0 : 180;
+                ViewCompat.animate(arrow).rotation(rotation).start();
+
+                isExpanded = !isExpanded;
+                appBarLayout.setExpanded(isExpanded, true);
+            }
+        });
     }
 
     @Override
     public void resetToolbar() {
-        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(previousToolbarTitle);
-        toolbar.setTitle(previousToolbarTitle);
+//        ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        activity.setTitle(previousToolbarTitle);
+        datePickerButton.setClickable(false);
+        datePickerButton.setFocusable(false);
+        arrow.setImageDrawable(null);
+//        toolbar.setTitle(previousToolbarTitle);
     }
 
-
+    private void setCurrentDate(Date date) {
+        activity.setTitle(dateFormat.format(date));
+        if (compactCalendarView != null) {
+            compactCalendarView.setCurrentDate(date);
+        }
+    }
 }
