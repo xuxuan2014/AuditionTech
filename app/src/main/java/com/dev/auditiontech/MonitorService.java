@@ -200,7 +200,7 @@ public class MonitorService extends Service {
                 String id = getID();
 
                 mDatabase.child(id).child("ambient_volume").
-                        child(date).child(currentMillisInString).setValue(db);
+                        child(currentMillisInString).setValue(db);
                 nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
 
                 //TODO: auto fix size

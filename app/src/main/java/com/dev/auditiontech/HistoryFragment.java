@@ -1,6 +1,5 @@
 package com.dev.auditiontech;
 
-import android.media.Image;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +12,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,12 +38,33 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
     private AppBarLayout appBarLayout;
     private ImageView arrow;
     private RelativeLayout datePickerButton;
+    private DateViewModel dateViewModel;
+    private DatabaseReference userReference;
 
     public static HistoryFragment getInstance() {
         if (instance == null) {
             instance = new HistoryFragment();
         }
         return instance;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        userReference = FirebaseDatabase.getInstance().getReference(getID());
+        dateViewModel = ViewModelProviders.of(this).get(DateViewModel.class);
+        final Observer<Date> dateObserver = new Observer<Date>() {
+            @Override
+            public void onChanged(Date date) {
+
+                activity.setTitle(dateFormat.format(date));
+                if (compactCalendarView != null) {
+                    compactCalendarView.setCurrentDate(date);
+                }
+            }
+        };
+        dateViewModel.getDate().observe(this,dateObserver);
+
     }
 
     @Nullable
@@ -77,16 +103,17 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
         compactCalendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
-                activity.setTitle(dateFormat.format(dateClicked));
+
+                dateViewModel.getDate().setValue(dateClicked);
             }
 
             @Override
             public void onMonthScroll(Date firstDayOfNewMonth) {
-                activity.setTitle(dateFormat.format(firstDayOfNewMonth));
+
+                dateViewModel.getDate().setValue(firstDayOfNewMonth);
             }
         });
 
-        setCurrentDate(new Date());
         arrow = activity.findViewById(R.id.date_picker_arrow);
         arrow.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_arrow_drop_down));
         datePickerButton = activity.findViewById(R.id.date_picker_button);
@@ -115,11 +142,10 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
         arrow.setImageDrawable(null);
 //        toolbar.setTitle(previousToolbarTitle);
     }
-
-    private void setCurrentDate(Date date) {
-        activity.setTitle(dateFormat.format(date));
-        if (compactCalendarView != null) {
-            compactCalendarView.setCurrentDate(date);
-        }
+    private String getID() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user.getUid();
+        return uid;
     }
 }
+
