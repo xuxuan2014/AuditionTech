@@ -2,6 +2,7 @@ package com.dev.auditiontech;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -46,7 +48,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 public class HistoryFragment extends Fragment implements ToolbarCustomizable {
     // TODO: fix this.
@@ -73,7 +74,9 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
             // start with  empty entry.
             List<Entry> dataList = new ArrayList<>();
             long startEpoch = getDateStartMilliSec(dateViewModel.getDate().getValue());
+            Log.d("start epoch",String.valueOf(startEpoch));
             long endEpoch = getNextDateStartMilliSec(dateViewModel.getDate().getValue());
+            Log.d("end epoch",String.valueOf(endEpoch));
             for (long epoch = startEpoch;
                  epoch <= endEpoch;
                  epoch += FIVE_MINUTES_IN_MILLI_SEC) {
@@ -82,19 +85,25 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
             // add data into entry.
             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                if (!snapshot.hasChild("timestamp") || snapshot.hasChild("volume")) {
+
+                if (!snapshot.hasChild("timestamp") || !snapshot.hasChild("volume")) {
                     continue;
                 }
-                int index = (int) ((snapshot.child("timestamp").getValue(Long.class) - startEpoch) % (FIVE_MINUTES_IN_MILLI_SEC));
+                Log.d("snapshot timestamp",String.valueOf(snapshot.child("timestamp").getValue(Long.class)));
+                Log.d("snapshot volume",String.valueOf(snapshot.child("volume").getValue(Integer.class)));
+                int index = (int) ((snapshot.child("timestamp").getValue(Long.class) - startEpoch) / (FIVE_MINUTES_IN_MILLI_SEC));
+                Log.d("snapshot index",String.valueOf(index));
                 dataList.get(index).setY(snapshot.child("volume").getValue(Integer.class));
             }
 
             LineDataSet set1 = new LineDataSet(dataList, "Max Volume");
 
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-            set1.setColor(ColorTemplate.getHoloBlue());
+
+            int primaryLightColor = ContextCompat.getColor(getContext(),R.color.primaryLightColor);
+            set1.setColor(primaryLightColor);
             set1.setValueTextColor(ColorTemplate.getHoloBlue());
-            set1.setLineWidth(1.5f);
+            set1.setLineWidth(2f);
             set1.setDrawCircles(false);
             set1.setDrawValues(false);
             set1.setFillAlpha(65);
@@ -108,8 +117,8 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
             data.setValueTextSize(9f);
 
             // set data
-            //chart.setData(data);
-
+            chart.setData(data);
+            chart.invalidate();
         }
 
         @Override
@@ -140,12 +149,6 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
                     compactCalendarView.setCurrentDate(date);
                 }
 
-                if (query != null) {
-                    query.removeEventListener(listener);
-                }
-
-                query = getQuery(date);
-                query.addValueEventListener(listener);
             }
         };
         dateViewModel.getDate().observe(this, dateObserver);
@@ -179,12 +182,27 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
     }
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        chart = getView().findViewById(R.id.chart);
+        setChart();
+        final Observer<Date> queryObserver = new Observer<Date>() {
+            @Override
+            public void onChanged(Date date) {
+                if (query != null) {
+                    query.removeEventListener(listener);
+                }
+                Log.d("query time start",String.valueOf(System.currentTimeMillis()));
+                query = getQuery(date);
+                Log.d("query time end", String.valueOf(System.currentTimeMillis()));
+                query.addValueEventListener(listener);
+            }
+        };
+        dateViewModel.getDate().observe(this,queryObserver);
+    }
+    @Override
     public void onResume() {
         super.onResume();
         setToolbar();
-        //chart = activity.findViewById(R.id.chart);
-        //setChart();
-
     }
 
     @Override
@@ -287,43 +305,45 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
         // set an alternative background color
         chart.setBackgroundColor(Color.WHITE);
-        chart.setViewPortOffsets(0f, 0f, 0f, 0f);
+        //chart.setViewPortOffsets(-10f, -10f, -10f, -10f);
+        int secondaryColor = ContextCompat.getColor(getContext(),R.color.secondaryColor);
 
         Legend l = chart.getLegend();
         l.setEnabled(false);
 
         XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.TOP_INSIDE);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         //xAxis.setTypeface(tfLight);
-        xAxis.setTextSize(10f);
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextSize(14f);
+        //xAxis.setTextColor(Color.WHITE);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(true);
-        xAxis.setTextColor(Color.rgb(255, 192, 56));
+        xAxis.setTextColor(secondaryColor);
         xAxis.setCenterAxisLabels(true);
-        xAxis.setGranularity(2f); // one hour
+        xAxis.setGranularity(4f);
+        xAxis.setYOffset(-2f);
         xAxis.setValueFormatter(new ValueFormatter() {
 
-            private final SimpleDateFormat mFormat = new SimpleDateFormat("dd MMM HH:mm", Locale.ENGLISH);
+            private final SimpleDateFormat mFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
 
             @Override
             public String getFormattedValue(float value) {
-
-                long millis = TimeUnit.MINUTES.toMillis((long) value);
-                return mFormat.format(new Date(millis));
+                return mFormat.format(new Date((long)value));
             }
         });
 
         YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
+        //leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         //leftAxis.setTypeface(tfLight);
-        leftAxis.setTextColor(ColorTemplate.getHoloBlue());
+        //leftAxis.setTextColor(ColorTemplate.getHoloBlue());
+        leftAxis.setTextSize(14f);
         leftAxis.setDrawGridLines(true);
         leftAxis.setGranularityEnabled(true);
         leftAxis.setAxisMinimum(0f);
         leftAxis.setAxisMaximum(170f);
         leftAxis.setYOffset(-9f);
-        leftAxis.setTextColor(Color.rgb(255, 192, 56));
+
+        leftAxis.setTextColor(secondaryColor);
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
