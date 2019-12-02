@@ -3,7 +3,7 @@ package com.dev.auditiontech.persistence.entity;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "exposure")
 public class Exposure {
     @PrimaryKey
     private long timestamp;

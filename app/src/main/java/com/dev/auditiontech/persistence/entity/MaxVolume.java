@@ -1,9 +1,10 @@
 package com.dev.auditiontech.persistence.entity;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "max_volume")
 public class MaxVolume {
     @PrimaryKey
     private long timestamp;

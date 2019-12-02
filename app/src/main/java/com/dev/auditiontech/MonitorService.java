@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.dev.auditiontech.persistence.dao.AmbientVolumeDAO;
+import com.dev.auditiontech.persistence.entity.AmbientVolume;
 import com.dev.auditiontech.utils.AmbientVolumeUtil;
 import com.dev.auditiontech.utils.TimeUtil;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,7 +54,17 @@ public class MonitorService extends Service {
             updateMicStatus();
         }
     };
+    private AmbientVolumeDAO ambientVolumeDAO;
+    private class SaveDataAsync extends AsyncTask<Long,Void,Void> {
 
+        @Override
+        protected Void doInBackground(Long... longs) {
+            Long timestamp = longs[0];
+            int volume = longs[1].intValue();
+            ambientVolumeDAO.insertAmbientVolume(new AmbientVolume(timestamp,volume));
+            return null;
+        }
+    }
     class LocalBinder extends Binder {
         MonitorService getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -68,10 +81,12 @@ public class MonitorService extends Service {
         initNotification();
         initMediaRecorder();
 
+        ambientVolumeDAO = ((AuditionTechApplication)getApplication()).getAppDatabase().ambientVolumeDAO();
         startMonitoring();
         mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(mRunnable, INTERVAL);
         MonitorService.service = this;
+
 
     }
 
@@ -219,12 +234,13 @@ public class MonitorService extends Service {
         return user.getUid();
     }
 
-    private void saveData(long timestamp, int dB) {
+    private void saveData(long timestamp, int volume) {
 //                String currentMillisInString = String.valueOf(System.currentTimeMillis());
 //                String id = getID();
 //
 //                mDatabase.child(id).child("ambient_volume").
 //                        child(currentMillisInString).setValue(db);
+        new SaveDataAsync().execute(timestamp, (long)volume);
 
     }
 }

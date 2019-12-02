@@ -10,6 +10,11 @@ public class AmbientVolume {
 
     private int volume;
 
+    public AmbientVolume(long timestamp, int volume) {
+        this.timestamp = timestamp;
+        this.volume = volume;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
