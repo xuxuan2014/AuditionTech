@@ -1,5 +1,6 @@
 package com.dev.auditiontech.persistence.entity;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -8,6 +9,7 @@ public class Exposure {
     @PrimaryKey
     private long timestamp;
 
+    @ColumnInfo(name = "exposure_value")
     private double exposure;
     private long seconds;
 

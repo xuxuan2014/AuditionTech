@@ -1,6 +1,7 @@
 package com.dev.auditiontech;
 
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +20,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.dev.auditiontech.persistence.dao.ExposureDAO;
+import com.dev.auditiontech.persistence.dao.MaxVolumeDAO;
+import com.dev.auditiontech.persistence.entity.MaxVolume;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -34,12 +38,6 @@ import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
@@ -52,6 +50,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
 public class HistoryFragment extends Fragment implements ToolbarCustomizable, OnChartValueSelectedListener {
     // TODO: fix this.
@@ -67,75 +66,57 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
     private ImageView arrow;
     private RelativeLayout datePickerButton;
     private DateViewModel dateViewModel;
-    private DatabaseReference userReference;
-    private Query query;
+    //   private DatabaseReference userReference;
+    //   private Query query;
     private static final long FIVE_MINUTES_IN_MILLI_SEC = 1000 * 5 * 60;
     private LineChart chart;
     private TextView timestampText;
     private TextView decibelText;
     private YAxis leftAxis;
-    private ValueEventListener listener = new ValueEventListener() {
-        @Override
-        @SuppressWarnings("ConstantConditions")
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+    private TextView exposureText;
+    private List<MaxVolume> maxVolumes;
+//    private ValueEventListener listener = new ValueEventListener() {
+//        @Override
+//        @SuppressWarnings("ConstantConditions")
+//        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//            // start with  empty entry.
+//            List<Entry> dataList = new ArrayList<>();
+//            long startEpoch = getDateStartMilliSec(dateViewModel.getDate().getValue());
+//            Log.d("start epoch", String.valueOf(startEpoch));
+//            long endEpoch = getNextDateStartMilliSec(dateViewModel.getDate().getValue());
+//            Log.d("end epoch", String.valueOf(endEpoch));
+//            for (long epoch = startEpoch;
+//                 epoch <= endEpoch;
+//                 epoch += FIVE_MINUTES_IN_MILLI_SEC) {
+//                dataList.add(new Entry(epoch, 0));
+//            }
+//
+//            // add data into entry.
+//            int maxVolume = 0;
+//            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//
+//                if (!snapshot.hasChild("timestamp") || !snapshot.hasChild("volume")) {
+//                    continue;
+//                }
+//                Log.d("snapshot timestamp", String.valueOf(snapshot.child("timestamp").getValue(Long.class)));
+//                Log.d("snapshot volume", String.valueOf(snapshot.child("volume").getValue(Integer.class)));
+//                int index = (int) ((snapshot.child("timestamp").getValue(Long.class) - startEpoch) / (FIVE_MINUTES_IN_MILLI_SEC));
+//                Log.d("snapshot index", String.valueOf(index));
+//                dataList.get(index).setY(snapshot.child("volume").getValue(Integer.class));
+//                maxVolume = Math.max(maxVolume, snapshot.child("volume").getValue(Integer.class));
+//            }
+//
+    //            leftAxis.setAxisMaximum((float) (maxVolume + 20));
+//setDataList(dataList);
 
-            // start with  empty entry.
-            List<Entry> dataList = new ArrayList<>();
-            long startEpoch = getDateStartMilliSec(dateViewModel.getDate().getValue());
-            Log.d("start epoch", String.valueOf(startEpoch));
-            long endEpoch = getNextDateStartMilliSec(dateViewModel.getDate().getValue());
-            Log.d("end epoch", String.valueOf(endEpoch));
-            for (long epoch = startEpoch;
-                 epoch <= endEpoch;
-                 epoch += FIVE_MINUTES_IN_MILLI_SEC) {
-                dataList.add(new Entry(epoch, 0));
-            }
-
-            // add data into entry.
-            int maxVolume = 0;
-            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-
-                if (!snapshot.hasChild("timestamp") || !snapshot.hasChild("volume")) {
-                    continue;
-                }
-                Log.d("snapshot timestamp", String.valueOf(snapshot.child("timestamp").getValue(Long.class)));
-                Log.d("snapshot volume", String.valueOf(snapshot.child("volume").getValue(Integer.class)));
-                int index = (int) ((snapshot.child("timestamp").getValue(Long.class) - startEpoch) / (FIVE_MINUTES_IN_MILLI_SEC));
-                Log.d("snapshot index", String.valueOf(index));
-                dataList.get(index).setY(snapshot.child("volume").getValue(Integer.class));
-                maxVolume = Math.max(maxVolume, snapshot.child("volume").getValue(Integer.class));
-            }
-
-            LineDataSet set1 = new LineDataSet(dataList, "Max Volume");
-
-            set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-
-            int primaryLightColor = ContextCompat.getColor(getContext(), R.color.primaryLightColor);
-            set1.setColor(primaryLightColor);
-            set1.setValueTextColor(ColorTemplate.getHoloBlue());
-            set1.setLineWidth(2f);
-            set1.setDrawCircles(false);
-            set1.setDrawValues(false);
-            set1.setFillAlpha(65);
-            set1.setFillColor(ColorTemplate.getHoloBlue());
-            set1.setHighLightColor(Color.rgb(244, 117, 117));
-            set1.setDrawCircleHole(false);
-
-            // create a data object with the data sets
-            LineData data = new LineData(set1);
-            data.setValueTextColor(Color.WHITE);
-            data.setValueTextSize(9f);
-            leftAxis.setAxisMaximum((float) (maxVolume + 20));
-            // set data
-            chart.setData(data);
-            chart.invalidate();
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-        }
-    };
+//        }
+//
+//        @Override
+//        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//        }
+//    };
 
     public static HistoryFragment getInstance() {
         if (instance == null) {
@@ -144,10 +125,43 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
         return instance;
     }
 
+    private static class GetMaxVolumeAsync extends AsyncTask<Long, Integer, List<MaxVolume>> {
+        private MaxVolumeDAO maxVolumeDAO;
+
+
+        public GetMaxVolumeAsync(AuditionTechApplication application) {
+            maxVolumeDAO = application.getAppDatabase().maxVolumeDAO();
+
+        }
+
+        @Override
+        protected List<MaxVolume> doInBackground(Long... longs) {
+            Long startTimestamp = longs[0];
+            Long endTimestamp = longs[1];
+            return maxVolumeDAO.getMaxVolumeWithin(startTimestamp, endTimestamp);
+
+        }
+    }
+
+    private static class GetExposureAsync extends AsyncTask<Long, Integer, Double> {
+        private ExposureDAO exposureDAO;
+
+        public GetExposureAsync(AuditionTechApplication application) {
+            exposureDAO = application.getAppDatabase().exposureDAO();
+        }
+
+        @Override
+        protected Double doInBackground(Long... longs) {
+            Long startTimestamp = longs[0];
+            Long endTimestamp = longs[1];
+            return exposureDAO.getExposureSum(startTimestamp, endTimestamp);
+        }
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userReference = FirebaseDatabase.getInstance().getReference(getID());
+        //userReference = FirebaseDatabase.getInstance().getReference(getID());
         dateViewModel = ViewModelProviders.of(this).get(DateViewModel.class);
 
         final Observer<Date> dateObserver = new Observer<Date>() {
@@ -165,17 +179,17 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
 
     }
 
-    private Query getQuery(Date date) {
-        return getQuery(date, "max_ambient_volume");
-    }
-
-    private Query getQuery(Date date, String relativePathUnderUserId) {
-        return userReference
-                .child(relativePathUnderUserId)
-                .orderByChild("timestamp")
-                .startAt(getDateStartMilliSec(date))
-                .endAt(getNextDateStartMilliSec(date));
-    }
+//    private Query getQuery(Date date) {
+//        return getQuery(date, "max_ambient_volume");
+//    }
+//
+//    private Query getQuery(Date date, String relativePathUnderUserId) {
+//        return userReference
+//                .child(relativePathUnderUserId)
+//                .orderByChild("timestamp")
+//                .startAt(getDateStartMilliSec(date))
+//                .endAt(getNextDateStartMilliSec(date));
+//    }
 
     @Nullable
     @Override
@@ -195,21 +209,80 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         chart = getView().findViewById(R.id.chart);
         setChart();
-        final Observer<Date> queryObserver = new Observer<Date>() {
+        exposureText = getView().findViewById(R.id.exposure_text);
+        final Observer<Date> maxVolumeObserver = new Observer<Date>() {
             @Override
             public void onChanged(Date date) {
-                if (query != null) {
-                    query.removeEventListener(listener);
+//                if (query != null) {
+//                    query.removeEventListener(listener);
+//                }
+//                Log.d("query time start", String.valueOf(System.currentTimeMillis()));
+//                query = getQuery(date);
+//                Log.d("query time end", String.valueOf(System.currentTimeMillis()));
+//                query.addValueEventListener(listener);
+
+                Long[] params = getTimestampParams(date);
+                try {
+                    maxVolumes = new GetMaxVolumeAsync((AuditionTechApplication) (getActivity().getApplication()))
+                            .execute(params).get();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
                 }
-                Log.d("query time start", String.valueOf(System.currentTimeMillis()));
-                query = getQuery(date);
-                Log.d("query time end", String.valueOf(System.currentTimeMillis()));
-                query.addValueEventListener(listener);
+
+                List<Entry> dataList = new ArrayList<>();
+                long startEpoch = getDateStartMilliSec(dateViewModel.getDate().getValue());
+                Log.d("start epoch", String.valueOf(startEpoch));
+                long endEpoch = getNextDateStartMilliSec(dateViewModel.getDate().getValue());
+                Log.d("end epoch", String.valueOf(endEpoch));
+                for (long epoch = startEpoch;
+                     epoch <= endEpoch;
+                     epoch += FIVE_MINUTES_IN_MILLI_SEC) {
+                    dataList.add(new Entry(epoch, 0));
+                }
+
+                // add data into entry.
+                int maxVolumeLevel = 0;
+                for (MaxVolume maxVolumeEntry : maxVolumes) {
+
+                    Log.d("snapshot timestamp", String.valueOf(maxVolumeEntry.getTimestamp()));
+                    Log.d("snapshot volume", String.valueOf(maxVolumeEntry.getVolume()));
+                    int index = (int) ((maxVolumeEntry.getTimestamp() - startEpoch) / (FIVE_MINUTES_IN_MILLI_SEC));
+                    Log.d("snapshot index", String.valueOf(index));
+                    dataList.get(index).setY(maxVolumeEntry.getVolume());
+                    maxVolumeLevel = Math.max(maxVolumeLevel, maxVolumeEntry.getVolume());
+                }
+
+                leftAxis.setAxisMaximum((float) (maxVolumeLevel + 20));
+
+                setDataList(dataList);
             }
         };
-        dateViewModel.getDate().observe(this, queryObserver);
+        dateViewModel.getDate().observe(this, maxVolumeObserver);
+
+        final Observer<Date> exposureObserver = new Observer<Date>() {
+            @Override
+            public void onChanged(Date date) {
+                Long[] params = getTimestampParams(date);
+                try {
+                    exposureText.setText(
+                            String.valueOf(
+                                    new GetExposureAsync(
+                                            (AuditionTechApplication) getActivity().getApplication())
+                                            .execute(params).get()));
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        dateViewModel.getDate().observe(this,exposureObserver);
         timestampText = getView().findViewById(R.id.timestamp_text);
         decibelText = getView().findViewById(R.id.decibel_text);
+    }
+
+    private Long[] getTimestampParams(Date date) {
+        Long startTimestamp = getDateStartMilliSec(date);
+        Long endTimestamp = getNextDateStartMilliSec(date);
+        return new Long[]{startTimestamp, endTimestamp};
     }
 
     @Override
@@ -337,11 +410,12 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
         xAxis.setYOffset(-2f);
         xAxis.setValueFormatter(new ValueFormatter() {
 
-            private final SimpleDateFormat mFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+            private final DateTimeFormatter mFormat = DateTimeFormatter.ofPattern("HH:mm");
 
             @Override
             public String getFormattedValue(float value) {
-                return mFormat.format(new Date((long) value));
+                ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli((long) value), ZoneId.systemDefault());
+                return mFormat.format(zdt);
             }
         });
 
@@ -379,6 +453,32 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
     @Override
     public void onNothingSelected() {
 
+    }
+
+    private void setDataList(List<Entry> entryList) {
+        LineDataSet set1 = new LineDataSet(entryList, "Max Volume");
+
+        set1.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+        int primaryLightColor = ContextCompat.getColor(getContext(), R.color.primaryLightColor);
+        set1.setColor(primaryLightColor);
+        set1.setValueTextColor(ColorTemplate.getHoloBlue());
+        set1.setLineWidth(2f);
+        set1.setDrawCircles(false);
+        set1.setDrawValues(false);
+        set1.setFillAlpha(65);
+        set1.setFillColor(ColorTemplate.getHoloBlue());
+        set1.setHighLightColor(Color.rgb(244, 117, 117));
+        set1.setDrawCircleHole(false);
+
+        // create a data object with the data sets
+        LineData data = new LineData(set1);
+        data.setValueTextColor(Color.WHITE);
+        data.setValueTextSize(9f);
+
+        // set data
+        chart.setData(data);
+        chart.invalidate();
     }
 }
 

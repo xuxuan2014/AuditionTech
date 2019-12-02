@@ -18,6 +18,9 @@ public interface ExposureDAO {
     @Query("SELECT * FROM exposure WHERE timestamp BETWEEN :startTimestamp AND :endTimestamp ")
     List<Exposure> getExposureBetween(long startTimestamp, long endTimestamp);
 
+    @Query("SELECT SUM(exposure_value) FROM exposure WHERE timestamp BETWEEN :startTimestamp AND :endTimestamp")
+    double getExposureSum(long startTimestamp, long endTimestamp);
+
     @Query("SELECT * FROM exposure WHERE timestamp = :timestamp")
     Exposure getExposure(long timestamp);
 
