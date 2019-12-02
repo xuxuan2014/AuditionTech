@@ -11,6 +11,12 @@ public class Exposure {
     private double exposure;
     private long seconds;
 
+    public Exposure(long timestamp, double exposure, long seconds) {
+        this.timestamp = timestamp;
+        this.exposure = exposure;
+        this.seconds = seconds;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

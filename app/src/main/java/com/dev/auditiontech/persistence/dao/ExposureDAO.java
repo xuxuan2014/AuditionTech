@@ -21,10 +21,7 @@ public interface ExposureDAO {
     @Query("SELECT * FROM exposure WHERE timestamp = :timestamp")
     Exposure getExposure(long timestamp);
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateExposure(Exposure exposure);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertExposure(Exposure exposure);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

@@ -29,4 +29,15 @@ public class TimeUtil {
     public static Integer getSecondsWithinDay() {
         return getHour() * 3600 + getMinute() * 60 + getSecond();
     }
+
+    public static long getTimestampToNearestMinutes(long timestamp) {
+        return getTimestampToNearestMinutes(timestamp,5);
+    }
+
+    public static long getTimestampToNearestMinutes(long timestamp, int minutes) {
+        long minutesInTimestamp = 1000*60*minutes;
+        return (timestamp / minutesInTimestamp) * minutesInTimestamp;
+    }
+
+
 }

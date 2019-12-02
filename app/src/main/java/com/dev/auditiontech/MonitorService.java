@@ -1,5 +1,6 @@
 package com.dev.auditiontech;
 
+import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -18,8 +19,13 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.dev.auditiontech.persistence.AppDatabase;
 import com.dev.auditiontech.persistence.dao.AmbientVolumeDAO;
+import com.dev.auditiontech.persistence.dao.ExposureDAO;
+import com.dev.auditiontech.persistence.dao.MaxVolumeDAO;
 import com.dev.auditiontech.persistence.entity.AmbientVolume;
+import com.dev.auditiontech.persistence.entity.Exposure;
+import com.dev.auditiontech.persistence.entity.MaxVolume;
 import com.dev.auditiontech.utils.AmbientVolumeUtil;
 import com.dev.auditiontech.utils.TimeUtil;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,14 +60,43 @@ public class MonitorService extends Service {
             updateMicStatus();
         }
     };
-    private AmbientVolumeDAO ambientVolumeDAO;
-    private class SaveDataAsync extends AsyncTask<Long,Void,Void> {
+
+    private static class SaveDataAsync extends AsyncTask<Long,Void,Void> {
+        private AmbientVolumeDAO ambientVolumeDAO;
+        private MaxVolumeDAO maxVolumeDAO;
+        private ExposureDAO exposureDAO;
+        public SaveDataAsync(AuditionTechApplication application) {
+            AppDatabase appDatabase = application.getAppDatabase();
+            ambientVolumeDAO = appDatabase.ambientVolumeDAO();
+            maxVolumeDAO = appDatabase.maxVolumeDAO();
+            exposureDAO = appDatabase.exposureDAO();
+        }
 
         @Override
         protected Void doInBackground(Long... longs) {
+
             Long timestamp = longs[0];
             int volume = longs[1].intValue();
+
             ambientVolumeDAO.insertAmbientVolume(new AmbientVolume(timestamp,volume));
+
+            MaxVolume maxVolume = maxVolumeDAO.getMaxVolume(TimeUtil.getTimestampToNearestMinutes(timestamp));
+            if (maxVolume == null) {
+                maxVolume = new MaxVolume(TimeUtil.getTimestampToNearestMinutes(timestamp),volume);
+            } else if (maxVolume.getVolume() < volume) {
+                maxVolume.setVolume(volume);
+            }
+            maxVolumeDAO.insertMaxVolume(maxVolume);
+
+            Exposure exposure = exposureDAO.getExposure(TimeUtil.getTimestampToNearestMinutes(timestamp,60));
+            if (exposure == null) {
+                exposure = new Exposure(TimeUtil.getTimestampToNearestMinutes(timestamp,60),
+                        AmbientVolumeUtil.decibalToPascal(volume),1);
+            } else {
+                exposure.setSeconds(exposure.getSeconds() + 1);
+                exposure.setExposure(exposure.getExposure() + AmbientVolumeUtil.decibalToPascal(volume));
+            }
+            exposureDAO.insertExposure(exposure);
             return null;
         }
     }
@@ -81,7 +116,7 @@ public class MonitorService extends Service {
         initNotification();
         initMediaRecorder();
 
-        ambientVolumeDAO = ((AuditionTechApplication)getApplication()).getAppDatabase().ambientVolumeDAO();
+
         startMonitoring();
         mHandler = new Handler(Looper.getMainLooper());
         mHandler.postDelayed(mRunnable, INTERVAL);
@@ -240,7 +275,7 @@ public class MonitorService extends Service {
 //
 //                mDatabase.child(id).child("ambient_volume").
 //                        child(currentMillisInString).setValue(db);
-        new SaveDataAsync().execute(timestamp, (long)volume);
+        new SaveDataAsync((AuditionTechApplication)getApplication()).execute(timestamp, (long)volume);
 
     }
 }

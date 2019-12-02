@@ -19,7 +19,7 @@ public interface MaxVolumeDAO {
     @Query("SELECT * FROM max_volume WHERE timestamp BETWEEN :startTimestamp AND :endTimestamp")
     List<MaxVolume> getMaxVolumeWithin(long startTimestamp, long endTimestamp);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMaxVolume(MaxVolume maxVolume);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -30,9 +30,6 @@ public interface MaxVolumeDAO {
 
     @Delete
     void deleteMaxVolumes(MaxVolume... maxVolumes);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateMaxVolume(MaxVolume maxVolume);
 
     @Query("SELECT * FROM max_volume WHERE timestamp = :timestamp")
     MaxVolume getMaxVolume(long timestamp);

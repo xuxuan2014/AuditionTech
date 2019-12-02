@@ -11,6 +11,11 @@ public class MaxVolume {
 
     private int volume;
 
+    public MaxVolume(long timestamp, int volume) {
+        this.timestamp = timestamp;
+        this.volume = volume;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }

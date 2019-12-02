@@ -13,4 +13,9 @@ public class AmbientVolumeUtil {
 
 
     }
+
+    public static double decibalToPascal(int dB) {
+        double p0 = 2 * Math.pow(10, -5);
+        return p0 * Math.pow(10, ((double)dB)/20);
+    }
 }
