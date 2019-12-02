@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.google.android.material.appbar.AppBarLayout;
@@ -41,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,12 +53,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class HistoryFragment extends Fragment implements ToolbarCustomizable {
+public class HistoryFragment extends Fragment implements ToolbarCustomizable, OnChartValueSelectedListener {
     // TODO: fix this.
     public static HistoryFragment instance;
     //    public static Toolbar toolbar;
     private static CharSequence previousToolbarTitle;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", /*Locale.getDefault()*/Locale.ENGLISH);
+
     private CompactCalendarView compactCalendarView;
     private boolean isExpanded;
     private AppCompatActivity activity;
@@ -66,6 +71,9 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
     private Query query;
     private static final long FIVE_MINUTES_IN_MILLI_SEC = 1000 * 5 * 60;
     private LineChart chart;
+    private TextView timestampText;
+    private TextView decibelText;
+    private YAxis leftAxis;
     private ValueEventListener listener = new ValueEventListener() {
         @Override
         @SuppressWarnings("ConstantConditions")
@@ -74,9 +82,9 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
             // start with  empty entry.
             List<Entry> dataList = new ArrayList<>();
             long startEpoch = getDateStartMilliSec(dateViewModel.getDate().getValue());
-            Log.d("start epoch",String.valueOf(startEpoch));
+            Log.d("start epoch", String.valueOf(startEpoch));
             long endEpoch = getNextDateStartMilliSec(dateViewModel.getDate().getValue());
-            Log.d("end epoch",String.valueOf(endEpoch));
+            Log.d("end epoch", String.valueOf(endEpoch));
             for (long epoch = startEpoch;
                  epoch <= endEpoch;
                  epoch += FIVE_MINUTES_IN_MILLI_SEC) {
@@ -84,23 +92,25 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
             }
 
             // add data into entry.
+            int maxVolume = 0;
             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
                 if (!snapshot.hasChild("timestamp") || !snapshot.hasChild("volume")) {
                     continue;
                 }
-                Log.d("snapshot timestamp",String.valueOf(snapshot.child("timestamp").getValue(Long.class)));
-                Log.d("snapshot volume",String.valueOf(snapshot.child("volume").getValue(Integer.class)));
+                Log.d("snapshot timestamp", String.valueOf(snapshot.child("timestamp").getValue(Long.class)));
+                Log.d("snapshot volume", String.valueOf(snapshot.child("volume").getValue(Integer.class)));
                 int index = (int) ((snapshot.child("timestamp").getValue(Long.class) - startEpoch) / (FIVE_MINUTES_IN_MILLI_SEC));
-                Log.d("snapshot index",String.valueOf(index));
+                Log.d("snapshot index", String.valueOf(index));
                 dataList.get(index).setY(snapshot.child("volume").getValue(Integer.class));
+                maxVolume = Math.max(maxVolume, snapshot.child("volume").getValue(Integer.class));
             }
 
             LineDataSet set1 = new LineDataSet(dataList, "Max Volume");
 
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-            int primaryLightColor = ContextCompat.getColor(getContext(),R.color.primaryLightColor);
+            int primaryLightColor = ContextCompat.getColor(getContext(), R.color.primaryLightColor);
             set1.setColor(primaryLightColor);
             set1.setValueTextColor(ColorTemplate.getHoloBlue());
             set1.setLineWidth(2f);
@@ -115,7 +125,7 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
             LineData data = new LineData(set1);
             data.setValueTextColor(Color.WHITE);
             data.setValueTextSize(9f);
-
+            leftAxis.setAxisMaximum((float)(maxVolume + 20));
             // set data
             chart.setData(data);
             chart.invalidate();
@@ -191,14 +201,17 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
                 if (query != null) {
                     query.removeEventListener(listener);
                 }
-                Log.d("query time start",String.valueOf(System.currentTimeMillis()));
+                Log.d("query time start", String.valueOf(System.currentTimeMillis()));
                 query = getQuery(date);
                 Log.d("query time end", String.valueOf(System.currentTimeMillis()));
                 query.addValueEventListener(listener);
             }
         };
-        dateViewModel.getDate().observe(this,queryObserver);
+        dateViewModel.getDate().observe(this, queryObserver);
+        timestampText = getView().findViewById(R.id.timestamp_text);
+        decibelText = getView().findViewById(R.id.decibel_text);
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -294,7 +307,7 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
         // enable touch gestures
         chart.setTouchEnabled(true);
-
+        chart.setOnChartValueSelectedListener(this);
         chart.setDragDecelerationFrictionCoef(0.9f);
 
         // enable scaling and dragging
@@ -306,7 +319,7 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
         // set an alternative background color
         chart.setBackgroundColor(Color.WHITE);
         //chart.setViewPortOffsets(-10f, -10f, -10f, -10f);
-        int secondaryColor = ContextCompat.getColor(getContext(),R.color.secondaryColor);
+        int secondaryColor = ContextCompat.getColor(getContext(), R.color.secondaryColor);
 
         Legend l = chart.getLegend();
         l.setEnabled(false);
@@ -328,11 +341,11 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
             @Override
             public String getFormattedValue(float value) {
-                return mFormat.format(new Date((long)value));
+                return mFormat.format(new Date((long) value));
             }
         });
 
-        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis = chart.getAxisLeft();
         //leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         //leftAxis.setTypeface(tfLight);
         //leftAxis.setTextColor(ColorTemplate.getHoloBlue());
@@ -347,6 +360,21 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable {
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
+    }
+
+    @Override
+    public void onValueSelected(Entry e, Highlight h) {
+        Log.d("entry", String.valueOf(e.getX()));
+        ZonedDateTime zonedDateTime = ZonedDateTime.
+                ofInstant(Instant.ofEpochMilli((long) e.getX()), ZoneId.systemDefault());
+        String localTime = DateTimeFormatter.ofPattern("hh:mm").format(zonedDateTime);
+        timestampText.setText(localTime);
+        decibelText.setText(String.valueOf((int) e.getY()) + "dB");
+    }
+
+    @Override
+    public void onNothingSelected() {
+
     }
 }
 

@@ -195,15 +195,13 @@ public class MonitorService extends Service {
                 double decibel = 20 * Math.log10(ratio);
                 db = (int) decibel;
 
-                String date = TimeUtil.getDate();
-                String currentMillisInString = String.valueOf(System.currentTimeMillis());
-                String id = getID();
+                //String date = TimeUtil.getDate();
 
-                mDatabase.child(id).child("ambient_volume").
-                        child(currentMillisInString).setValue(db);
-                nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
+
+                saveData(System.currentTimeMillis(), db);
 
                 //TODO: auto fix size
+                nCB.setContentTitle(getString(R.string.notification_title_default) + db + " db");
                 nCB.setContentText(AmbientVolumeUtil.getPrompt(db));
                 nm.notify(notificationID, nCB.build());
             }
@@ -219,5 +217,14 @@ public class MonitorService extends Service {
             user = FirebaseAuth.getInstance().getCurrentUser();
         }
         return user.getUid();
+    }
+
+    private void saveData(long timestamp, int dB) {
+//                String currentMillisInString = String.valueOf(System.currentTimeMillis());
+//                String id = getID();
+//
+//                mDatabase.child(id).child("ambient_volume").
+//                        child(currentMillisInString).setValue(db);
+
     }
 }
