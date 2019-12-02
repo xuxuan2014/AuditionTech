@@ -28,10 +28,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".DayDiscrete" />
         <activity android:name=".questionnaireResult" />
         <activity android:name=".questionnaire" />
-        <activity android:name=".HearingHistory" />
         <activity android:name=".profile" />
         <activity android:name=".MediaVolume" />
         <activity android:name=".OnBoardingActivity">

@@ -125,7 +125,7 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
             LineData data = new LineData(set1);
             data.setValueTextColor(Color.WHITE);
             data.setValueTextSize(9f);
-            leftAxis.setAxisMaximum((float)(maxVolume + 20));
+            leftAxis.setAxisMaximum((float) (maxVolume + 20));
             // set data
             chart.setData(data);
             chart.invalidate();
@@ -369,7 +369,11 @@ public class HistoryFragment extends Fragment implements ToolbarCustomizable, On
                 ofInstant(Instant.ofEpochMilli((long) e.getX()), ZoneId.systemDefault());
         String localTime = DateTimeFormatter.ofPattern("hh:mm").format(zonedDateTime);
         timestampText.setText(localTime);
-        decibelText.setText(String.valueOf((int) e.getY()) + "dB");
+        if (e.getY() == 0f) {
+            decibelText.setText("N/A");
+        } else {
+            decibelText.setText((int) e.getY() + "dB");
+        }
     }
 
     @Override

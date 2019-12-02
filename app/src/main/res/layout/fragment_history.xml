@@ -67,8 +67,7 @@
                 android:id="@+id/timestamp_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="timestamp" />
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/textView7"
@@ -81,8 +80,7 @@
                 android:id="@+id/decibel_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="volume_in_db" />
+                android:layout_weight="1" />
         </LinearLayout>
     </LinearLayout>
 
