@@ -91,10 +91,10 @@ public class MonitorService extends Service {
             Exposure exposure = exposureDAO.getExposure(TimeUtil.getTimestampToNearestMinutes(timestamp,60));
             if (exposure == null) {
                 exposure = new Exposure(TimeUtil.getTimestampToNearestMinutes(timestamp,60),
-                        AmbientVolumeUtil.decibalToPascal(volume),1);
+                        Math.pow(AmbientVolumeUtil.decibalToPascal(volume),2)/3600,1);
             } else {
                 exposure.setSeconds(exposure.getSeconds() + 1);
-                exposure.setExposure(exposure.getExposure() + AmbientVolumeUtil.decibalToPascal(volume));
+                exposure.setExposure(exposure.getExposure() + Math.pow(AmbientVolumeUtil.decibalToPascal(volume),2)/3600);
             }
             exposureDAO.insertExposure(exposure);
             return null;

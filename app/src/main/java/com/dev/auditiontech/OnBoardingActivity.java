@@ -34,6 +34,10 @@ public class OnBoardingActivity extends AppCompatActivity {
         setupUIViews();
 
         mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() != null) {
+            startActivity(new Intent(this, MainActivity.class));
+        }
         initAuthListener();
 
 
@@ -84,7 +88,7 @@ public class OnBoardingActivity extends AppCompatActivity {
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    //Remove authentification listener when activity starts
+    //Remove authentication listener when activity starts
     @Override
     public void onStop() {
         super.onStop();

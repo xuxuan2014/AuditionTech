@@ -1,6 +1,7 @@
 package com.dev.auditiontech;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -56,8 +57,8 @@ public class RegisterFragment extends OnBoardingBaseFragment {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
 
-                                        Toast.makeText(getContext(), "Registration successful", Toast.LENGTH_SHORT).show();
-                                        goToLogin();
+                                        Toast.makeText(getContext(), "Registration successful", Toast.LENGTH_LONG).show();
+                                        startActivity(new Intent(getActivity(), MainActivity.class));
                                     } else {
                                         Toast.makeText(getContext(), "Wrong password", Toast.LENGTH_SHORT).show();
                                     }
